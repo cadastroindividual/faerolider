@@ -7,329 +7,127 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
-
-<script src="database.js"></script>
-<script src="auth.js"></script>
-  <style>
-    .hub-layout{
-      position:relative;z-index:10;
-      display:grid;grid-template-columns:260px 1fr 260px;
-      gap:14px;padding:14px 12px 90px;min-height:calc(100vh - 80px);
-      max-width:1400px;margin:0 auto;
-    }
-    /* Sidebar left */
-    .sidebar{padding:18px 14px;display:flex;flex-direction:column;gap:16px;height:fit-content;}
-    .tool-btn{
-      display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;
-      background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.75);
-      cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700;color:var(--text);
-      transition:var(--trans);text-align:left;width:100%;
-    }
-    .tool-btn:hover{background:rgba(255,255,255,.65);transform:translateX(4px);box-shadow:0 4px 14px rgba(0,100,255,.14);}
-    .tool-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;position:relative;overflow:hidden;}
-    .tool-icon::after{content:'';position:absolute;top:3px;left:4px;width:14px;height:7px;background:rgba(255,255,255,.5);border-radius:50%;transform:rotate(-20deg);filter:blur(2px);}
-
-    /* Rank panels */
-    .rank-panel{display:flex;flex-direction:column;}
-    .rank-hdr{
-      padding:14px 18px;display:flex;align-items:center;gap:12px;
-      border-bottom:1px solid rgba(255,255,255,.5);
-    }
-    .rank-hdr-icon{width:42px;height:42px;border-radius:11px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 8px rgba(0,80,200,.09);}
-    .rank-list{padding:10px;display:flex;flex-direction:column;gap:5px;min-height:80px;}
-
-    /* User card in ranking */
-    .rk-card{
-      background:linear-gradient(135deg,rgba(255,255,255,.78) 0%,rgba(220,240,255,.4) 100%);
-      border:1px solid rgba(255,255,255,.85);border-radius:13px;
-      padding:10px 14px;display:flex;align-items:center;gap:10px;
-      cursor:pointer;transition:var(--trans);text-decoration:none;color:inherit;
-      animation:card-in .3s ease;
-    }
-    .rk-card::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.35) 0%,transparent 100%);border-radius:13px 13px 0 0;pointer-events:none;}
-    .rk-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,100,255,.14);}
-    .rk-pos{font-size:13px;font-weight:900;min-width:26px;text-align:center;color:var(--text-mid);}
-    .rk-info{flex:1;}
-    .rk-info strong{font-size:13px;font-weight:800;color:var(--text);display:block;}
-    .rk-info small{font-size:11px;color:var(--text-light);}
-    .rk-xp{font-size:12px;font-weight:800;padding:3px 10px;border-radius:50px;background:rgba(0,140,255,.1);border:1px solid rgba(0,140,255,.25);color:var(--text-mid);white-space:nowrap;}
-    .status-wrap{display:flex;align-items:center;gap:4px;}
-
-    /* Meta cards */
-    .meta-card{
-      background:linear-gradient(135deg,rgba(255,240,150,.75) 0%,rgba(255,200,50,.25) 100%);
-      border:1px solid rgba(255,215,0,.55);border-radius:14px;
-      padding:14px 16px;display:flex;flex-direction:column;gap:8px;
-      box-shadow:0 4px 16px rgba(200,130,0,.12);
-      animation:card-in .3s ease;
-    }
-    .meta-card-header{display:flex;align-items:center;gap:8px;}
-    .meta-progress{width:100%;height:8px;background:rgba(255,255,255,.4);border-radius:50px;overflow:hidden;}
-    .meta-bar{height:100%;border-radius:50px;background:linear-gradient(90deg,#ffaa00,#ff6600);transition:width .8s;}
-
-    /* Banner */
-    .rank-banner{padding:16px 22px;display:flex;align-items:center;justify-content:space-between;}
-    .stat-chip{display:flex;flex-direction:column;align-items:center;padding:8px 18px;border-radius:50px;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.8);}
-
-    @media(max-width:1100px){.hub-layout{grid-template-columns:1fr;}}
-  </style>
-</head>
-
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="database.js"></script>
   <script type="module">
-import { requireAuth } from "./auth.js";
-requireAuth();
-</script>
-
+    import { requireAuth } from "./auth.js";
+    window.requireAuth = requireAuth;
+  </script>
+</head>
 <body>
   <div class="bg-sky"></div>
-  <div class="aurora aurora-1"></div><div class="aurora aurora-2"></div><div class="aurora aurora-3"></div>
-  <div class="bg-bokeh"><div class="bokeh b1"></div><div class="bokeh b2"></div><div class="bokeh b3"></div><div class="bokeh b4"></div><div class="bokeh b5"></div><div class="bokeh b6"></div></div>
+  <header id="global-header" class="glass" style="padding:15px 30px;display:flex;justify-content:space-between;align-items:center;">
+    <h1 style="font-size:18px;font-weight:900;">HUB SOCIAL</h1>
+    <div id="user-header" style="display:flex;align-items:center;gap:12px;"></div>
+  </header>
 
-  <header id="global-header" class="glass"></header>
-
-  <div class="hub-layout">
-
-    <!-- LEFT SIDEBAR: Tools -->
-    <aside class="glass sidebar">
+  <div class="hub-layout" style="display:grid;grid-template-columns:260px 1fr 260px;gap:15px;padding:15px;">
+    <!-- SIDEBAR ESQUERDA -->
+    <aside class="glass" style="padding:15px;">
       <p class="section-title">⚡ Ferramentas</p>
-      <button class="tool-btn" onclick="location.href='feed.html'">
-        <span class="tool-icon orb-blue" style="background:var(--orb-blue);">📰</span> Feed Social
-      </button>
-      <button class="tool-btn">
-        <span class="tool-icon orb-green" style="background:var(--orb-green);">📂</span> Cadastro
-      </button>
-      <button class="tool-btn">
-        <span class="tool-icon orb-teal" style="background:var(--orb-teal);">📊</span> Relatórios
-      </button>
-      <button class="tool-btn">
-        <span class="tool-icon orb-gold" style="background:var(--orb-gold);">📋</span> Cotação
-      </button>
-      <button class="tool-btn admin-only hidden" onclick="location.href='admin.html'">
-        <span class="tool-icon orb-pink" style="background:var(--orb-pink);">⚙️</span> Painel ADM
-      </button>
-
-      <div class="divider"></div>
-      <p class="section-title">👑 Líder do Mês</p>
-      <div class="glass-sm p-16 text-center" style="display:flex;flex-direction:column;align-items:center;gap:8px;">
-        <div style="font-size:32px;animation:crown-bounce 2s ease-in-out infinite;">👑</div>
-        <div id="lider-avatar"></div>
-        <p style="font-size:15px;font-weight:800;color:var(--text);" id="lider-nome">—</p>
-        <p style="font-size:12px;font-weight:700;background:linear-gradient(135deg,#ffdd44,#ff9900);-webkit-background-clip:text;-webkit-text-fill-color:transparent;" id="lider-xp">⭐ — XP</p>
+      <button class="tool-btn" onclick="location.href='feed.html'">📰 Feed Social</button>
+      <button class="tool-btn">📊 Cotação</button>
+      <button class="tool-btn">📂 Carência</button>
+      <button class="tool-btn">📋 Repique</button>
+      <div id="master-tools" class="hidden">
+        <hr style="margin:10px 0;opacity:0.2;">
+        <button class="tool-btn" style="background:rgba(255,215,0,0.2);border-color:rgba(255,215,0,0.5);" onclick="location.href='admin.html'">👑 Painel MASTER</button>
       </div>
-      @keyframes crown-bounce{0%,100%{transform:translateY(0) rotate(-5deg);}50%{transform:translateY(-6px) rotate(5deg);}}
     </aside>
 
-    <!-- CENTER: Rankings + Metas -->
-    <section style="display:flex;flex-direction:column;gap:14px;">
-
-      <!-- Banner -->
-      <div class="glass rank-banner">
-        <div>
-          <h2 style="font-size:18px;font-weight:900;">🏆 Ranking de Performance</h2>
-          <p style="font-size:12px;color:var(--text-light);">Atualizado em tempo real</p>
-        </div>
-        <div style="display:flex;gap:12px;">
-          <div class="stat-chip"><span style="font-size:18px;font-weight:900;" id="stat-total">—</span><span style="font-size:10px;font-weight:700;color:var(--text-light);">Membros</span></div>
-          <div class="stat-chip"><span style="font-size:18px;font-weight:900;" id="stat-online">—</span><span style="font-size:10px;font-weight:700;color:var(--text-light);">Online</span></div>
-        </div>
-      </div>
-
-      <!-- Rank columns -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" id="rank-cols">
-        <div class="glass rank-panel">
-          <div class="rank-hdr">
-            <div class="rank-hdr-icon">🏅</div>
-            <div><h2 style="font-size:14px;font-weight:900;">Equipe Interna</h2><small style="font-size:11px;color:var(--text-light);">ADM / Funcionários</small></div>
+    <!-- CENTRO: RANKINGS -->
+    <section style="display:flex;flex-direction:column;gap:15px;">
+      <div class="glass" style="padding:20px;">
+        <h2 style="font-size:16px;font-weight:900;margin-bottom:15px;">🏆 Ranking de Performance (Mensal)</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+          <div>
+            <p class="section-title">🏢 Equipe Interna</p>
+            <div id="rank-interno"></div>
           </div>
-          <div class="rank-list" id="rank-internos"></div>
-        </div>
-        <div class="glass rank-panel">
-          <div class="rank-hdr">
-            <div class="rank-hdr-icon">🚀</div>
-            <div><h2 style="font-size:14px;font-weight:900;">Corretores Autônomos</h2><small style="font-size:11px;color:var(--text-light);">Parceiros externos</small></div>
+          <div>
+            <p class="section-title">🚀 Corretores Autônomos</p>
+            <div id="rank-corretor"></div>
           </div>
-          <div class="rank-list" id="rank-autonomos"></div>
         </div>
       </div>
-
-      <!-- Metas ativas -->
-      <div class="glass" style="padding:18px;">
-        <p class="section-title">🎯 Metas em Andamento</p>
-        <div id="metas-list" style="display:flex;flex-direction:column;gap:10px;">
-          <p style="font-size:13px;color:var(--text-light);text-align:center;padding:16px 0;">Nenhuma meta ativa no momento.</p>
-        </div>
-      </div>
-
     </section>
 
-    <!-- RIGHT SIDEBAR: Desafios Relâmpago -->
-    <aside style="display:flex;flex-direction:column;gap:14px;height:fit-content;">
-      <div class="glass sidebar">
-        <p class="section-title">⚡ Desafios Relâmpago</p>
-        <div id="desafios-list" style="display:flex;flex-direction:column;gap:8px;">
-          <p style="font-size:12px;color:var(--text-light);text-align:center;padding:12px 0;">Nenhum desafio ativo.</p>
-        </div>
+    <!-- SIDEBAR DIREITA: LÍDERES DO MÊS -->
+    <aside style="display:flex;flex-direction:column;gap:15px;">
+      <div class="glass lider-destaque" style="padding:15px;text-align:center;">
+        <p class="section-title">⭐ Funcionário do Mês</p>
+        <div id="lider-interno-card"></div>
       </div>
-      <div class="glass sidebar">
-        <p class="section-title">📣 Feed Recente</p>
-        <div id="feed-preview" style="display:flex;flex-direction:column;gap:8px;"></div>
-        <a href="feed.html" class="btn btn-blue btn-sm w-full mt-8" style="margin-top:12px;">Ver Feed Completo →</a>
+      <div class="glass lider-destaque" style="padding:15px;text-align:center;">
+        <p class="section-title">🌟 Corretor do Mês</p>
+        <div id="lider-corretor-card"></div>
       </div>
     </aside>
-
   </div>
 
-  <div id="taskbar" class="glass"><div class="taskbar-time"></div><div class="taskbar-date"></div></div>
-
-  <script src="database.js"></script>
-  <script src="auth.js"></script>
   <script>
-    requireAuth(userData => {
-      renderHeader('hub');
-      if (userData.role === 'MASTER') {
-        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+    window.requireAuth(userData => {
+      document.getElementById('user-header').innerHTML = `
+        <span>Olá, <strong>${userData.nome}</strong></span>
+        ${renderAvatar(userData, 'sm')}
+      `;
+      if (userData.role === 'MASTER' || userData.role === 'admin') {
+        document.getElementById('master-tools').classList.remove('hidden');
       }
-      loadRanking();
-      loadMetas();
-      loadDesafios(userData);
-      loadFeedPreview();
+      loadRankings();
+      loadLideres();
     });
 
-    function statusInfo(status) {
-      if (status === 'online')    return { dot: 'status-online',    label: 'Online' };
-      if (status === 'intervalo') return { dot: 'status-intervalo', label: 'Intervalo' };
-      return { dot: 'status-offline', label: 'Offline' };
-    }
-
-    function loadRanking() {
-      db.collection('usuarios').where('aprovado','==',true).orderBy('xp','desc')
-        .onSnapshot(snap => {
-          const internos  = document.getElementById('rank-internos');
-          const autonomos = document.getElementById('rank-autonomos');
-          internos.innerHTML = ''; autonomos.innerHTML = '';
-
-          let iIdx = 0, aIdx = 0, total = 0, online = 0;
-          let lider = null;
-
-          snap.forEach(doc => {
-            const u = { uid: doc.id, ...doc.data() };
-            total++;
-            if (u.status === 'online') online++;
-            if (u.isLiderDoMes && !lider) lider = u;
-
-            const pos   = u.tipo === 'interno' ? ++iIdx : ++aIdx;
-            const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `#${pos}`;
-            const si    = statusInfo(u.status);
-            const lvl   = xpToLevel(u.xp);
-
-            const card = document.createElement('a');
-            card.href = `perfil.html?uid=${u.uid}`;
-            card.className = `rk-card ${u.isLiderDoMes ? 'lider-destaque' : ''}`;
-            card.style.position = 'relative';
-            card.innerHTML = `
-              <span class="rk-pos">${medal}</span>
-              ${renderAvatar(u, 'sm')}
-              <div class="rk-info">
-                <strong>${u.nome}</strong>
-                <div class="status-wrap">
-                  <span class="status-dot ${si.dot}"></span>
-                  <small>${si.label} · Nv.${lvl.level}</small>
-                </div>
-              </div>
-              <span class="rk-xp">⚡${u.xp}</span>`;
-
-            (u.tipo === 'interno' ? internos : autonomos).appendChild(card);
-          });
-
-          document.getElementById('stat-total').textContent = total;
-          document.getElementById('stat-online').textContent = online;
-
-          if (lider) {
-            document.getElementById('lider-nome').textContent = lider.nome;
-            document.getElementById('lider-xp').textContent  = `⭐ ${lider.xp} XP`;
-            document.getElementById('lider-avatar').innerHTML = renderAvatar(lider, 'md');
-          }
-
-          if (!internos.innerHTML)  internos.innerHTML  = '<p style="text-align:center;padding:16px;font-size:12px;color:var(--text-light);">Sem membros internos.</p>';
-          if (!autonomos.innerHTML) autonomos.innerHTML = '<p style="text-align:center;padding:16px;font-size:12px;color:var(--text-light);">Sem autônomos.</p>';
-        });
-    }
-
-    function loadMetas() {
-      const now = new Date();
-      db.collection('metas').where('ativa','==',true).onSnapshot(snap => {
-        const el = document.getElementById('metas-list');
+    function loadRankings() {
+      // Interno
+      db.collection('usuarios').where('tipo','==','INTERNO').where('aprovado','==',true).orderBy('xp','desc').limit(5).onSnapshot(snap => {
+        const el = document.getElementById('rank-interno');
         el.innerHTML = '';
-        if (snap.empty) {
-          el.innerHTML = '<p style="font-size:13px;color:var(--text-light);text-align:center;padding:16px 0;">Nenhuma meta ativa.</p>';
-          return;
-        }
         snap.forEach(doc => {
-          const m = { id: doc.id, ...doc.data() };
-          const pct = Math.min(100, Math.round(((m.progresso||0) / m.objetivo) * 100));
-          el.innerHTML += `
-            <div class="meta-card">
-              <div class="meta-card-header">
-                <span style="font-size:18px;">🎯</span>
-                <div style="flex:1;">
-                  <strong style="font-size:13px;">${m.titulo}</strong>
-                  <br><small style="font-size:11px;color:var(--text-light);">${m.usuarioNome} · ${m.xpRecompensa} XP</small>
-                </div>
-                <span style="font-size:12px;font-weight:800;color:#664400;">${pct}%</span>
-              </div>
-              <div class="meta-progress"><div class="meta-bar" style="width:${pct}%"></div></div>
-              <small style="font-size:11px;color:var(--text-light);">${m.descricao||''}</small>
-            </div>`;
+          const u = doc.data();
+          el.innerHTML += `<div class="glass-sm" style="padding:8px;margin-bottom:5px;display:flex;align-items:center;gap:10px;">
+            ${renderAvatar(u, 'sm')} <strong>${u.nome}</strong> <span style="margin-left:auto;">${u.xp || 0} XP</span>
+          </div>`;
+        });
+      });
+      // Corretor
+      db.collection('usuarios').where('tipo','==','CORRETOR').where('aprovado','==',true).orderBy('xp','desc').limit(5).onSnapshot(snap => {
+        const el = document.getElementById('rank-corretor');
+        el.innerHTML = '';
+        snap.forEach(doc => {
+          const u = doc.data();
+          el.innerHTML += `<div class="glass-sm" style="padding:8px;margin-bottom:5px;display:flex;align-items:center;gap:10px;">
+            ${renderAvatar(u, 'sm')} <strong>${u.nome}</strong> <span style="margin-left:auto;">${u.xp || 0} XP</span>
+          </div>`;
         });
       });
     }
 
-    function loadDesafios(userData) {
-      db.collection('desafios').where('ativo','==',true).onSnapshot(snap => {
-        const el = document.getElementById('desafios-list');
-        el.innerHTML = '';
-        if (snap.empty) { el.innerHTML = '<p style="font-size:12px;color:var(--text-light);text-align:center;padding:12px 0;">Nenhum desafio ativo.</p>'; return; }
-        snap.forEach(doc => {
-          const d = { id: doc.id, ...doc.data() };
-          const done = d.completadoPor && d.completadoPor[userData.uid];
-          el.innerHTML += `
-            <div class="glass-sm p-16" style="opacity:${done?'.6':'1'};">
-              <p style="font-size:13px;font-weight:800;">⚡ ${d.titulo}</p>
-              <p style="font-size:11px;color:var(--text-light);margin-top:4px;">${d.descricao}</p>
-              ${d.hashtags ? `<div style="margin-top:6px;">${d.hashtags.map(h=>`<span class="badge badge-blue">${h}</span>`).join(' ')}</div>` : ''}
-              <p style="font-size:12px;font-weight:800;color:#005500;margin-top:6px;">${done ? '✅ Concluído!' : `+${d.xpRecompensa} XP`}</p>
-            </div>`;
-        });
+    function loadLideres() {
+      // Funcionário do Mês
+      db.collection('usuarios').where('liderInterno','==',true).limit(1).onSnapshot(snap => {
+        const el = document.getElementById('lider-interno-card');
+        if (snap.empty) { el.innerHTML = '<p>Aguardando definição...</p>'; return; }
+        const u = snap.docs[0].data();
+        el.innerHTML = `
+          ${renderAvatar(u, 'lg')}
+          <p style="margin-top:10px;font-weight:900;">${u.nome}</p>
+          <small>${u.xp || 0} XP no Mês</small>
+        `;
       });
-    }
-
-    function loadFeedPreview() {
-      db.collection('posts').orderBy('criadoEm','desc').limit(3).onSnapshot(snap => {
-        const el = document.getElementById('feed-preview');
-        el.innerHTML = '';
-        snap.forEach(doc => {
-          const p = doc.data();
-          el.innerHTML += `
-            <div class="glass-sm p-16">
-              <p style="font-size:12px;font-weight:800;">${p.autorNome}</p>
-              <p style="font-size:12px;color:var(--text-light);margin-top:3px;">${(p.texto||'').slice(0,80)}${p.texto?.length>80?'…':''}</p>
-            </div>`;
-        });
+      // Corretor do Mês
+      db.collection('usuarios').where('liderCorretor','==',true).limit(1).onSnapshot(snap => {
+        const el = document.getElementById('lider-corretor-card');
+        if (snap.empty) { el.innerHTML = '<p>Aguardando definição...</p>'; return; }
+        const u = snap.docs[0].data();
+        el.innerHTML = `
+          ${renderAvatar(u, 'lg')}
+          <p style="margin-top:10px;font-weight:900;">${u.nome}</p>
+          <small>${u.xp || 0} XP no Mês</small>
+        `;
       });
     }
   </script>
 </body>
 </html>
-<script type="module">
-import { auth } from "./auth.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    window.location.href = "login.html";
-  }
-});
-</script>

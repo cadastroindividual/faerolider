@@ -3,464 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Painel ADM — Frutiger Aero Líder</title>
+  <title>Painel MASTER — Frutiger Aero Líder</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
- <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
-
-<script src="database.js"></script>
-<script src="auth.js"></script>
-  <style>
-    .adm-layout{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:14px 12px 90px;}
-    .adm-tabs{display:flex;gap:6px;margin-bottom:14px;}
-    .admtab{padding:9px 20px;border-radius:50px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.38);color:var(--text-light);transition:var(--trans);}
-    .admtab.active{background:linear-gradient(180deg,#55b8ff,#0088ee);color:#fff;box-shadow:0 3px 12px rgba(0,100,255,.35);}
-    .adm-section{display:none;} .adm-section.active{display:block;}
-
-    /* User table */
-    .user-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:13px;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.8);margin-bottom:6px;transition:var(--trans);}
-    .user-row:hover{background:rgba(255,255,255,.7);}
-    .user-row-info{flex:1;}
-    .user-row-info strong{font-size:14px;font-weight:800;}
-    .user-row-info small{font-size:11px;color:var(--text-light);}
-    .user-row-actions{display:flex;gap:6px;flex-wrap:wrap;}
-
-    /* Cards for conquistas / desafios */
-    .item-card{padding:16px;border-radius:14px;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.8);margin-bottom:8px;display:flex;align-items:center;gap:14px;}
-    .item-card-info{flex:1;}
-    .item-card-actions{display:flex;gap:6px;}
-
-    /* Form */
-    .adm-form{padding:20px;margin-bottom:14px;}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    .form-field{display:flex;flex-direction:column;gap:5px;}
-    .form-field label{font-size:11px;font-weight:800;color:var(--text-light);text-transform:uppercase;letter-spacing:1px;}
-    .full-width{grid-column:1/-1;}
-  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="database.js"></script>
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    window.requireAuth = requireAuth;
+  </script>
 </head>
 <body>
   <div class="bg-sky"></div>
-  <div class="aurora aurora-1"></div><div class="aurora aurora-2"></div><div class="aurora aurora-3"></div>
-  <div class="bg-bokeh"><div class="bokeh b1"></div><div class="bokeh b2"></div><div class="bokeh b3"></div><div class="bokeh b4"></div><div class="bokeh b5"></div><div class="bokeh b6"></div></div>
-  <header id="global-header" class="glass"></header>
-
   <div class="adm-layout">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div class="orb orb-md orb-pink">⚙️</div>
-      <div><h1 style="font-size:20px;font-weight:900;">Painel MASTERistrativo</h1>
-        <p style="font-size:12px;color:var(--text-light);">Gerencie usuários, conquistas, desafios e metas</p>
+      <div class="orb orb-md orb-gold lider-destaque">👑</div>
+      <div><h1 style="font-size:20px;font-weight:900;">Painel de Controle MASTER</h1>
+        <p style="font-size:12px;color:var(--text-light);">Gerenciamento Total: Usuários, XP e Conquistas</p>
       </div>
     </div>
 
     <div class="adm-tabs">
-      <button class="admtab active" onclick="switchAdmTab('usuarios',this)">👥 Usuários</button>
-      <button class="admtab" onclick="switchAdmTab('conquistas',this)">🏅 Conquistas</button>
-      <button class="admtab" onclick="switchAdmTab('desafios',this)">⚡ Desafios</button>
-      <button class="admtab" onclick="switchAdmTab('metas',this)">🎯 Metas Pessoais</button>
+      <button class="admtab active" onclick="switchTab('usuarios',this)">👥 Usuários</button>
+      <button class="admtab" onclick="switchTab('conquistas',this)">🏅 Conquistas</button>
+      <button class="admtab" onclick="switchTab('desafios',this)">⚡ Desafios</button>
     </div>
 
-    <!-- USUÁRIOS -->
+    <!-- GESTÃO DE USUÁRIOS -->
     <div class="adm-section active glass" id="adm-usuarios" style="padding:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <p class="section-title">👥 Todos os Usuários</p>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-blue btn-sm" onclick="filterUsers('all')" id="filter-all">Todos</button>
-          <button class="btn btn-sm" style="background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.7);" onclick="filterUsers('pending')" id="filter-pending">⏳ Pendentes</button>
-        </div>
-      </div>
+      <p class="section-title">Aprovações Pendentes & Gestão</p>
       <div id="users-list"></div>
     </div>
 
-    <!-- CONQUISTAS -->
+    <!-- GESTÃO DE CONQUISTAS -->
     <div class="adm-section" id="adm-conquistas">
-      <!-- Form criar -->
-      <div class="glass adm-form">
-        <p class="section-title">🏅 Nova Conquista</p>
+      <div class="glass adm-form" style="padding:20px;margin-bottom:14px;">
+        <p class="section-title">🏅 Criar Nova Conquista (Badge)</p>
         <div class="form-grid">
-          <div class="form-field">
-            <label>Ícone (emoji)</label>
-            <div class="input-wrap"><input type="text" id="c-icone" class="aero-input" style="padding-left:14px;" placeholder="🏆" maxlength="4"></div>
-          </div>
-          <div class="form-field">
-            <label>Nome</label>
-            <div class="input-wrap"><input type="text" id="c-nome" class="aero-input" style="padding-left:14px;" placeholder="Vendedor do Mês"></div>
-          </div>
-          <div class="form-field full-width">
-            <label>Descrição</label>
-            <div class="input-wrap"><input type="text" id="c-desc" class="aero-input" style="padding-left:14px;" placeholder="Vendeu mais de 20 planos em um mês"></div>
-          </div>
-          <div class="form-field">
-            <label>XP Bônus</label>
-            <div class="input-wrap"><input type="number" id="c-xp" class="aero-input" style="padding-left:14px;" placeholder="100" min="0"></div>
-          </div>
+          <input type="text" id="badge-nome" class="aero-input" placeholder="Nome da Conquista">
+          <select id="badge-categoria" class="aero-select">
+            <option value="comum">🔵 Comum (Aero/Vidro)</option>
+            <option value="rara">🟣 Rara (Roxo Neon)</option>
+            <option value="lendaria">🏆 Lendária (Dourado Brilhante)</option>
+          </select>
+          <input type="text" id="badge-icone" class="aero-input" placeholder="Emoji (ex: 🏆)">
+          <textarea id="badge-desc" class="aero-textarea full-width" placeholder="Descrição da conquista..."></textarea>
         </div>
-        <button class="btn btn-green mt-16" onclick="createConquista()">+ Criar Conquista</button>
+        <button class="btn btn-green mt-16" onclick="saveBadge()">Salvar Conquista</button>
       </div>
-      <div class="glass" style="padding:20px;">
-        <p class="section-title">Lista de Conquistas</p>
-        <div id="conquistas-list"></div>
-      </div>
+      <div id="badges-list" class="glass" style="padding:20px;"></div>
     </div>
 
-    <!-- DESAFIOS -->
+    <!-- GESTÃO DE DESAFIOS -->
     <div class="adm-section" id="adm-desafios">
-      <div class="glass adm-form">
-        <p class="section-title">⚡ Novo Desafio Relâmpago</p>
-        <div class="form-grid">
-          <div class="form-field">
-            <label>Título</label>
-            <div class="input-wrap"><input type="text" id="d-titulo" class="aero-input" style="padding-left:14px;" placeholder="Café da manhã solidário"></div>
-          </div>
-          <div class="form-field">
-            <label>Tipo</label>
-            <select id="d-tipo" class="aero-select" onchange="toggleHashtagField()">
-              <option value="hashtag">Hashtag no post</option>
-              <option value="manual">Aprovação manual</option>
-            </select>
-          </div>
-          <div class="form-field full-width" id="d-hashtag-wrap">
-            <label>Hashtags obrigatórias (separadas por vírgula)</label>
-            <div class="input-wrap"><input type="text" id="d-hashtags" class="aero-input" style="padding-left:14px;" placeholder="#quelindodia, #meucafezinho, #desafiolider"></div>
-          </div>
-          <div class="form-field full-width">
-            <label>Descrição</label>
-            <textarea id="d-desc" class="aero-textarea" style="min-height:60px;" placeholder="Poste no Feed Social a foto do seu café da manhã..."></textarea>
-          </div>
-          <div class="form-field">
-            <label>XP Recompensa</label>
-            <div class="input-wrap"><input type="number" id="d-xp" class="aero-input" style="padding-left:14px;" placeholder="50" min="1"></div>
-          </div>
-          <div class="form-field">
-            <label>Data de expiração (opcional)</label>
-            <div class="input-wrap"><input type="datetime-local" id="d-expires" class="aero-input" style="padding-left:14px;"></div>
-          </div>
-        </div>
-        <button class="btn btn-green mt-16" onclick="createDesafio()">⚡ Lançar Desafio</button>
-      </div>
-      <div class="glass" style="padding:20px;">
-        <p class="section-title">Desafios Ativos & Histórico</p>
-        <div id="desafios-list"></div>
+       <div class="glass adm-form" style="padding:20px;">
+        <p class="section-title">⚡ Lançar Desafio Relâmpago</p>
+        <input type="text" id="d-titulo" class="aero-input mb-10" placeholder="Título do Desafio">
+        <textarea id="d-desc" class="aero-textarea mb-10" placeholder="Descrição e regras..."></textarea>
+        <input type="number" id="d-xp" class="aero-input" placeholder="XP Recompensa">
+        <button class="btn btn-blue mt-16" onclick="createDesafio()">Lançar no Feed</button>
       </div>
     </div>
-
-    <!-- METAS PESSOAIS -->
-    <div class="adm-section" id="adm-metas">
-      <div class="glass adm-form">
-        <p class="section-title">🎯 Nova Meta Pessoal</p>
-        <div class="form-grid">
-          <div class="form-field">
-            <label>Usuário</label>
-            <select id="m-usuario" class="aero-select"></select>
-          </div>
-          <div class="form-field">
-            <label>Título</label>
-            <div class="input-wrap"><input type="text" id="m-titulo" class="aero-input" style="padding-left:14px;" placeholder="Vender 15 vidas essa semana!"></div>
-          </div>
-          <div class="form-field full-width">
-            <label>Descrição</label>
-            <div class="input-wrap"><input type="text" id="m-desc" class="aero-input" style="padding-left:14px;" placeholder="Meta definida pelo gerente para essa semana."></div>
-          </div>
-          <div class="form-field">
-            <label>Objetivo (número)</label>
-            <div class="input-wrap"><input type="number" id="m-obj" class="aero-input" style="padding-left:14px;" placeholder="15" min="1"></div>
-          </div>
-          <div class="form-field">
-            <label>XP se completar</label>
-            <div class="input-wrap"><input type="number" id="m-xp" class="aero-input" style="padding-left:14px;" placeholder="200" min="1"></div>
-          </div>
-        </div>
-        <button class="btn btn-gold mt-16" onclick="createMeta()">🎯 Definir Meta</button>
-      </div>
-      <div class="glass" style="padding:20px;">
-        <p class="section-title">Metas Ativas</p>
-        <div id="metas-list-adm"></div>
-      </div>
-    </div>
-
   </div>
 
-  <div id="taskbar" class="glass"><div class="taskbar-time"></div><div class="taskbar-date"></div></div>
-
-  <script src="database.js"></script>
-  <script src="auth.js"></script>
   <script>
-    let allUsersAdm = [];
+    let currentUser = null;
 
-    requireAuth(async userData => {
-      if (userData.role !== 'MASTER') { window.location.href='index.html'; return; }
-      renderHeader('MASTER');
+    window.requireAuth(userData => {
+      if (userData.role !== 'MASTER' && userData.role !== 'admin') {
+        window.location.href = 'index.html';
+        return;
+      }
+      currentUser = userData;
       loadUsers();
-      loadConquistasAdm();
-      loadDesafiosAdm();
-      loadMetasAdm();
-      loadUsersForSelect();
+      loadBadges();
     });
 
-    // ── Tab switch ────────────────────────────
-    function switchAdmTab(name, btn) {
+    function switchTab(name, btn) {
       document.querySelectorAll('.adm-section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.admtab').forEach(el => el.classList.remove('active'));
       document.getElementById(`adm-${name}`).classList.add('active');
       btn.classList.add('active');
     }
 
-    // ── USERS ─────────────────────────────────
-    let currentFilter = 'all';
-    function filterUsers(f) { currentFilter = f; renderUsersList(); }
-
-    function loadUsers() {
-      db.collection('usuarios').orderBy('criadoEm','desc').onSnapshot(snap => {
-        allUsersAdm = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
-        renderUsersList();
+    async function loadUsers() {
+      db.collection('usuarios').orderBy('createdAt', 'desc').onSnapshot(snap => {
+        const el = document.getElementById('users-list');
+        el.innerHTML = '';
+        snap.forEach(doc => {
+          const u = doc.data();
+          const uid = doc.id;
+          el.innerHTML += `
+            <div class="user-row glass-sm" style="padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+              ${renderAvatar(u, 'sm')}
+              <div style="flex:1">
+                <strong>${u.nome}</strong> (${u.role})<br>
+                <small>${u.email} · ${u.xp || 0} XP · ${u.aprovado ? '✅ Aprovado' : '⏳ PENDENTE'}</small>
+              </div>
+              <div>
+                ${!u.aprovado ? `<button class="btn btn-green btn-sm" onclick="approveUser('${uid}')">Aprovar</button>` : ''}
+                <button class="btn btn-blue btn-sm" onclick="grantBadgePrompt('${uid}')">Badge</button>
+                <button class="btn btn-gold btn-sm" onclick="setLeader('${uid}', '${u.tipo}')">👑 Líder</button>
+              </div>
+            </div>`;
+        });
       });
     }
 
-    function renderUsersList() {
-      const el = document.getElementById('users-list');
-      el.innerHTML = '';
-      const filtered = currentFilter === 'pending'
-        ? allUsersAdm.filter(u => !u.aprovado)
-        : allUsersAdm;
-
-      filtered.forEach(u => {
-        const statusSi = u.status==='online'?{cls:'status-online',lbl:'Online'}:u.status==='intervalo'?{cls:'status-intervalo',lbl:'Intervalo'}:{cls:'status-offline',lbl:'Offline'};
-        el.innerHTML += `
-          <div class="user-row">
-            ${renderAvatar(u,'sm')}
-            <div class="user-row-info">
-              <strong>${u.nome}</strong> <span class="badge ${u.role==='MASTER'?'badge-gold':u.tipo==='interno'?'badge-blue':'badge-green'}">${u.role==='MASTER'?'👑 MASTER':u.tipo==='interno'?'Interno':'Autônomo'}</span>
-              <br><small>${u.email} · <span class="status-dot ${statusSi.cls}" style="display:inline-block;"></span> ${statusSi.lbl} · ${u.xp||0} XP · ${u.aprovado?'✅ Aprovado':'⏳ Pendente'}</small>
-            </div>
-            <div class="user-row-actions">
-              <a href="perfil.html?uid=${u.uid}" class="btn btn-blue btn-sm">👤 Perfil</a>
-              ${!u.aprovado ? `<button class="btn btn-green btn-sm" onclick="aprovarUser('${u.uid}')">✅ Aprovar</button>` : ''}
-              ${u.role!=='MASTER' ? `<button class="btn btn-gold btn-sm" onclick="setMASTER('${u.uid}',true)">👑 Tornar MASTER</button>` : `<button class="btn btn-sm" style="background:rgba(255,200,0,.2);border:1px solid rgba(255,200,0,.4);" onclick="setMASTER('${u.uid}',false)">Remover MASTER</button>`}
-              <button class="btn btn-red btn-sm" onclick="deleteUser('${u.uid}','${u.email}')">🗑</button>
-            </div>
-          </div>`;
-      });
-      if (!filtered.length) el.innerHTML = '<p style="text-align:center;font-size:13px;color:var(--text-light);padding:20px;">Nenhum usuário encontrado.</p>';
-    }
-
-    async function aprovarUser(uid) {
+    async function approveUser(uid) {
       await db.collection('usuarios').doc(uid).update({ aprovado: true });
-      showToast('✅ Usuário aprovado!','success');
-    }
-    async function setMASTER(uid, val) {
-      const ok = await showConfirm(val ? 'Tornar este usuário MASTER?' : 'Remover permissão de MASTER?');
-      if (!ok) return;
-      await db.collection('usuarios').doc(uid).update({ role: val ? 'MASTER' : 'user' });
-      showToast(val ? '👑 MASTER definido!' : 'MASTER removido.','info');
-    }
-    async function deleteUser(uid, email) {
-      const ok = await showConfirm(`Excluir usuário ${email}? Isso não remove a conta do Firebase Auth.`);
-      if (!ok) return;
-      await db.collection('usuarios').doc(uid).delete();
-      showToast('Usuário removido do banco.','info');
+      alert("Usuário aprovado com sucesso!");
     }
 
-    // ── CONQUISTAS ────────────────────────────
-    async function createConquista() {
-      const icone = document.getElementById('c-icone').value.trim() || '🏅';
-      const nome  = document.getElementById('c-nome').value.trim();
-      const desc  = document.getElementById('c-desc').value.trim();
-      const xp    = parseInt(document.getElementById('c-xp').value) || 0;
-      if (!nome) { showToast('Informe o nome da conquista.','error'); return; }
-      await db.collection('conquistas').add({ icone, nome, descricao: desc, xpBonus: xp, criadaEm: firebase.firestore.FieldValue.serverTimestamp() });
-      ['c-icone','c-nome','c-desc','c-xp'].forEach(id => document.getElementById(id).value = '');
-      showToast('🏅 Conquista criada!','success');
+    async function setLeader(uid, tipo) {
+      const field = tipo === 'INTERNO' ? 'liderInterno' : 'liderCorretor';
+      // Limpa líder anterior
+      const snap = await db.collection('usuarios').where(field, '==', true).get();
+      const batch = db.batch();
+      snap.forEach(d => batch.update(d.ref, { [field]: false }));
+      // Seta novo
+      batch.update(db.collection('usuarios').doc(uid), { [field]: true });
+      await batch.commit();
+      alert("Líder do Mês atualizado!");
     }
 
-    function loadConquistasAdm() {
-      db.collection('conquistas').orderBy('criadaEm','desc').onSnapshot(snap => {
-        const el = document.getElementById('conquistas-list');
-        el.innerHTML = '';
+    async function saveBadge() {
+      const nome = document.getElementById('badge-nome').value;
+      const cat = document.getElementById('badge-categoria').value;
+      const icone = document.getElementById('badge-icone').value;
+      const desc = document.getElementById('badge-desc').value;
+      
+      await db.collection('conquistas').add({ nome, categoria: cat, icone, descricao: desc });
+      alert("Conquista criada!");
+    }
+
+    async function loadBadges() {
+      db.collection('conquistas').onSnapshot(snap => {
+        const el = document.getElementById('badges-list');
+        el.innerHTML = '<p class="section-title">Conquistas Cadastradas</p>';
         snap.forEach(doc => {
-          const c = { id: doc.id, ...doc.data() };
-          el.innerHTML += `
-            <div class="item-card">
-              <span style="font-size:28px;">${c.icone||'🏅'}</span>
-              <div class="item-card-info">
-                <strong style="font-size:14px;">${c.nome}</strong>
-                <p style="font-size:12px;color:var(--text-light);">${c.descricao||''} · <strong>+${c.xpBonus||0} XP</strong></p>
-              </div>
-              <div class="item-card-actions">
-                <button class="btn btn-red btn-sm" onclick="deleteItem('conquistas','${c.id}')">🗑</button>
-              </div>
-            </div>`;
+          const b = doc.data();
+          el.innerHTML += `<div class="badge-${b.categoria}" style="padding:5px 12px;border-radius:20px;display:inline-block;margin:5px;font-size:12px;">${b.icone} ${b.nome}</div>`;
         });
-        if (snap.empty) el.innerHTML = '<p style="font-size:13px;color:var(--text-light);">Nenhuma conquista cadastrada.</p>';
       });
     }
 
-    // ── DESAFIOS ──────────────────────────────
-    function toggleHashtagField() {
-      const tipo = document.getElementById('d-tipo').value;
-      document.getElementById('d-hashtag-wrap').style.display = tipo === 'hashtag' ? 'flex' : 'none';
-    }
-
-    async function createDesafio() {
-      const titulo   = document.getElementById('d-titulo').value.trim();
-      const tipo     = document.getElementById('d-tipo').value;
-      const desc     = document.getElementById('d-desc').value.trim();
-      const xp       = parseInt(document.getElementById('d-xp').value) || 10;
-      const expires  = document.getElementById('d-expires').value;
-      const hashRaw  = document.getElementById('d-hashtags').value;
-      if (!titulo) { showToast('Informe o título do desafio.','error'); return; }
-
-      const hashtags = tipo === 'hashtag'
-        ? hashRaw.split(',').map(h => h.trim().toLowerCase()).filter(Boolean)
-        : [];
-
-      const data = {
-        titulo, tipo, descricao: desc, xpRecompensa: xp,
-        hashtags, ativo: true, completadoPor: {},
-        criadaEm: firebase.firestore.FieldValue.serverTimestamp(),
-        dataExpiracao: expires ? new Date(expires) : null
-      };
-      await db.collection('desafios').add(data);
-
-      // Post auto no feed
-      await db.collection('posts').add({
-        autorUid: currentUser.uid, autorNome: '⚡ Sistema — Desafio Relâmpago',
-        autorTipo: 'sistema', texto: `⚡ NOVO DESAFIO: **${titulo}**\n${desc}\n${hashtags.map(h=>`${h}`).join(' ')}\n🏆 Recompensa: +${xp} XP`,
-        fotoBase64: null, hashtags, mencoes: [], curtidas: {}, reacoes: {},
-        isDesafio: true, criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      ['d-titulo','d-desc','d-xp','d-hashtags','d-expires'].forEach(id => document.getElementById(id).value = '');
-      showToast('⚡ Desafio lançado e postado no feed!','success');
-    }
-
-    function loadDesafiosAdm() {
-      db.collection('desafios').orderBy('criadaEm','desc').onSnapshot(snap => {
-        const el = document.getElementById('desafios-list');
-        el.innerHTML = '';
-        snap.forEach(doc => {
-          const d = { id: doc.id, ...doc.data() };
-          const completados = Object.keys(d.completadoPor||{}).length;
-          el.innerHTML += `
-            <div class="item-card">
-              <span style="font-size:24px;">${d.ativo?'⚡':'✅'}</span>
-              <div class="item-card-info">
-                <strong>${d.titulo}</strong>
-                <p style="font-size:12px;color:var(--text-light);">${d.descricao||''}</p>
-                <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
-                  <span class="badge badge-blue">+${d.xpRecompensa} XP</span>
-                  <span class="badge badge-green">${completados} completaram</span>
-                  ${d.hashtags?.map(h=>`<span class="badge badge-blue">${h}</span>`).join('')||''}
-                  <span class="badge ${d.ativo?'badge-green':'badge-red'}">${d.ativo?'Ativo':'Encerrado'}</span>
-                </div>
-              </div>
-              <div class="item-card-actions">
-                <button class="btn ${d.ativo?'btn-red':'btn-green'} btn-sm" onclick="toggleDesafio('${d.id}',${!d.ativo})">${d.ativo?'Encerrar':'Reativar'}</button>
-                <button class="btn btn-red btn-sm" onclick="deleteItem('desafios','${d.id}')">🗑</button>
-              </div>
-            </div>`;
-        });
-        if (snap.empty) el.innerHTML = '<p style="font-size:13px;color:var(--text-light);">Nenhum desafio criado.</p>';
-      });
-    }
-
-    async function toggleDesafio(id, val) {
-      await db.collection('desafios').doc(id).update({ ativo: val });
-      showToast(val ? '⚡ Desafio reativado!' : '✅ Desafio encerrado.','info');
-    }
-
-    // ── METAS ─────────────────────────────────
-    async function loadUsersForSelect() {
-      const snap = await db.collection('usuarios').where('aprovado','==',true).get();
-      const sel  = document.getElementById('m-usuario');
-      sel.innerHTML = '<option value="">Selecione o usuário...</option>';
+    async function grantBadgePrompt(uid) {
+      const snap = await db.collection('conquistas').get();
+      let list = "Escolha o ID da conquista:\n";
+      const badges = [];
       snap.forEach(d => {
-        const u = d.data();
-        sel.innerHTML += `<option value="${d.id}|${u.nome}">${u.nome} (${u.tipo})</option>`;
+        badges.push({id: d.id, ...d.data()});
+        list += `${badges.length - 1}: ${d.data().nome}\n`;
       });
-    }
-
-    async function createMeta() {
-      const userVal = document.getElementById('m-usuario').value;
-      const titulo  = document.getElementById('m-titulo').value.trim();
-      const desc    = document.getElementById('m-desc').value.trim();
-      const obj     = parseInt(document.getElementById('m-obj').value) || 1;
-      const xp      = parseInt(document.getElementById('m-xp').value) || 50;
-      if (!userVal || !titulo) { showToast('Preencha todos os campos.','error'); return; }
-      const [uid, nome] = userVal.split('|');
-
-      const metaData = {
-        usuarioUid: uid, usuarioNome: nome,
-        titulo, descricao: desc, objetivo: obj, progresso: 0,
-        xpRecompensa: xp, ativa: true,
-        criadaEm: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      await db.collection('metas').add(metaData);
-
-      // Post no feed
-      await db.collection('posts').add({
-        autorUid: currentUser.uid, autorNome: '🎯 Sistema — Nova Meta',
-        autorTipo: 'sistema',
-        texto: `🎯 META DEFINIDA para @${nome}:\n"${titulo}"\n${desc}\n🏆 Recompensa: +${xp} XP se concluir!`,
-        fotoBase64: null, hashtags: [], mencoes: [uid],
-        curtidas:{}, reacoes:{}, isMeta: true,
-        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      ['m-titulo','m-desc','m-obj','m-xp'].forEach(id => document.getElementById(id).value='');
-      document.getElementById('m-usuario').value = '';
-      showToast('🎯 Meta criada e postada no Feed!','success');
-    }
-
-    function loadMetasAdm() {
-      db.collection('metas').where('ativa','==',true).orderBy('criadaEm','desc').onSnapshot(snap => {
-        const el = document.getElementById('metas-list-adm');
-        el.innerHTML = '';
-        snap.forEach(doc => {
-          const m = { id: doc.id, ...doc.data() };
-          const pct = Math.min(100, Math.round(((m.progresso||0)/m.objetivo)*100));
-          el.innerHTML += `
-            <div class="item-card" style="flex-direction:column;align-items:flex-start;gap:8px;">
-              <div style="display:flex;align-items:center;gap:12px;width:100%;">
-                <span style="font-size:22px;">🎯</span>
-                <div style="flex:1;">
-                  <strong>${m.titulo}</strong> <span class="badge badge-blue">${m.usuarioNome}</span>
-                  <p style="font-size:12px;color:var(--text-light);">Objetivo: ${m.progresso||0}/${m.objetivo} · +${m.xpRecompensa} XP</p>
-                </div>
-                <div class="item-card-actions">
-                  <button class="btn btn-blue btn-sm" onclick="updateMetaProgressAdm('${m.id}',${m.progresso||0},${m.objetivo},'${m.usuarioUid}',${m.xpRecompensa},'${m.titulo}','${m.usuarioNome}')">✏️</button>
-                  <button class="btn btn-red btn-sm" onclick="deleteItem('metas','${m.id}')">🗑</button>
-                </div>
-              </div>
-              <div style="width:100%;">
-                <div class="xp-bar-wrap" style="height:10px;"><div class="xp-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,#ffaa00,#ff6600);"></div></div>
-                <span style="font-size:10px;color:var(--text-light);">${pct}%</span>
-              </div>
-            </div>`;
+      const idx = prompt(list);
+      if (idx !== null && badges[idx]) {
+        await db.collection('usuarios').doc(uid).update({
+          conquistas: firebase.firestore.FieldValue.arrayUnion(badges[idx])
         });
-        if (snap.empty) el.innerHTML = '<p style="font-size:13px;color:var(--text-light);">Nenhuma meta ativa.</p>';
-      });
-    }
-
-    async function updateMetaProgressAdm(metaId, current, max, userUid, xpBonus, titulo, nome) {
-      const val = prompt(`Atualizar progresso de ${nome}\n(atual: ${current}, meta: ${max}):`, current);
-      if (val === null) return;
-      const num = parseInt(val); if (isNaN(num)) return;
-      await db.collection('metas').doc(metaId).update({ progresso: num });
-      if (num >= max) {
-        await addXP(userUid, xpBonus, `Meta concluída: ${titulo}`);
-        await db.collection('metas').doc(metaId).update({ ativa: false, concluidaEm: firebase.firestore.FieldValue.serverTimestamp() });
-        showToast(`🎉 Meta concluída! +${xpBonus} XP para ${nome}!`, 'success', 5000);
-      } else { showToast('Progresso atualizado!','success'); }
-    }
-
-    // ── Generic delete ─────────────────────────
-    async function deleteItem(collection, id) {
-      const ok = await showConfirm('Excluir este item permanentemente?');
-      if (!ok) return;
-      await db.collection(collection).doc(id).delete();
-      showToast('Item removido.','info');
+        alert("Conquista concedida!");
+      }
     }
   </script>
 </body>

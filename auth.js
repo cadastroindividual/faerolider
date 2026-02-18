@@ -18,7 +18,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Função para verificar quantos MASTERs existem
-async function contarMasters( ) {
+async function contarMasters() {
   const q = query(collection(db, "usuarios"), where("role", "==", "MASTER"));
   const snapshot = await getDocs(q);
   return snapshot.size;

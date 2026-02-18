@@ -6,484 +6,73 @@
   <title>Perfil — Frutiger Aero Líder</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
-
-<script src="database.js"></script>
-<script src="auth.js"></script>
-  <style>
-    .profile-layout{position:relative;z-index:10;max-width:860px;margin:0 auto;padding:14px 12px 90px;}
-
-    /* Cover + Avatar */
-    .cover-wrap{position:relative;border-radius:20px;overflow:hidden;height:200px;background:linear-gradient(135deg,#1a90e8,#00ccbb,#88ff66);}
-    .cover-img{width:100%;height:100%;object-fit:cover;}
-    .cover-edit-btn{position:absolute;bottom:12px;right:14px;}
-    .avatar-wrap{position:absolute;bottom:-44px;left:28px;}
-    .avatar-ring{border:4px solid rgba(255,255,255,.95);border-radius:50%;box-shadow:0 6px 20px rgba(0,80,200,.25);position:relative;overflow:visible;}
-    .avatar-ring img,.avatar-ring .orb{border-radius:50%;}
-    .avatar-edit-btn{position:absolute;bottom:2px;right:2px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#55b8ff,#0088ee);border:2px solid #fff;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;}
-
-    /* Profile info */
-    .profile-info{padding:56px 28px 20px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-    .profile-name{font-size:22px;font-weight:900;color:var(--text);}
-    .profile-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px;}
-    .status-chip{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:50px;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.7);font-size:11px;font-weight:700;}
-    .bio-text{font-size:13px;color:var(--text-light);margin-top:6px;max-width:500px;}
-
-    /* Stats row */
-    .stats-row{display:flex;gap:14px;flex-wrap:wrap;padding:0 22px 18px;}
-    .stat-card{flex:1;min-width:100px;padding:12px 16px;text-align:center;border-radius:14px;}
-    .stat-card .num{font-size:22px;font-weight:900;color:var(--text);}
-    .stat-card .lbl{font-size:10px;font-weight:700;color:var(--text-light);letter-spacing:1px;text-transform:uppercase;}
-
-    /* Tabs */
-    .profile-tabs{display:flex;gap:6px;padding:0 22px;margin-bottom:14px;}
-    .ptab{padding:8px 18px;border-radius:50px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;border:none;background:rgba(255,255,255,.35);color:var(--text-light);transition:var(--trans);}
-    .ptab.active{background:linear-gradient(180deg,#55b8ff,#0088ee);color:#fff;box-shadow:0 3px 12px rgba(0,100,255,.35);}
-    .tab-content{padding:0 22px 22px;}
-
-    /* Conquistas */
-    .conquistas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px;}
-    .conquista-card{padding:14px 10px;text-align:center;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:6px;}
-    .conquista-card .icon{font-size:28px;}
-    .conquista-card .name{font-size:11px;font-weight:800;color:var(--text);}
-    .conquista-card .xp{font-size:10px;font-weight:700;color:var(--text-light);}
-    .conquista-locked{opacity:.35;filter:grayscale(1);}
-
-    /* Fotos destaque */
-    .fotos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-    .foto-item{aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative;cursor:pointer;}
-    .foto-item img{width:100%;height:100%;object-fit:cover;transition:var(--trans);}
-    .foto-item:hover img{transform:scale(1.05);}
-    .foto-add{aspect-ratio:1;border-radius:12px;border:2px dashed rgba(100,180,255,.5);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:28px;background:rgba(255,255,255,.3);transition:var(--trans);}
-    .foto-add:hover{background:rgba(255,255,255,.5);}
-
-    /* Meta pessoal */
-    .meta-personal{padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(255,240,150,.7) 0%,rgba(255,200,50,.2) 100%);border:1px solid rgba(255,215,0,.5);}
-  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="database.js"></script>
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    window.requireAuth = requireAuth;
+  </script>
 </head>
 <body>
   <div class="bg-sky"></div>
-  <div class="aurora aurora-1"></div><div class="aurora aurora-2"></div><div class="aurora aurora-3"></div>
-  <div class="bg-bokeh"><div class="bokeh b1"></div><div class="bokeh b2"></div><div class="bokeh b3"></div><div class="bokeh b4"></div><div class="bokeh b5"></div><div class="bokeh b6"></div></div>
-  <header id="global-header" class="glass"></header>
-
-  <div class="profile-layout">
-    <div class="glass" id="profile-card">
-      <!-- COVER -->
-      <div class="cover-wrap" id="cover-wrap">
-        <img id="cover-img" src="" style="display:none;" class="cover-img">
-        <button class="btn btn-blue btn-sm cover-edit-btn hidden" id="btn-edit-cover" onclick="document.getElementById('cover-file').click()">🖼 Alterar Capa</button>
-        <input type="file" id="cover-file" accept="image/*" style="display:none;" onchange="uploadCover(this)">
-        <div class="avatar-wrap">
-          <div class="avatar-ring" id="avatar-ring">
-            <div id="avatar-display"></div>
-            <button class="avatar-edit-btn hidden" id="btn-edit-avatar" onclick="document.getElementById('avatar-file').click()">✏️</button>
-            <input type="file" id="avatar-file" accept="image/*" style="display:none;" onchange="uploadAvatar(this)">
-          </div>
-        </div>
-      </div>
-
-      <!-- INFO -->
-      <div class="profile-info">
-        <div>
-          <div class="profile-name" id="profile-name">Carregando...</div>
-          <div class="profile-meta">
-            <div class="status-chip" id="profile-status-chip"><span class="status-dot status-offline"></span><span>Offline</span></div>
-            <span class="badge badge-blue" id="profile-tipo">—</span>
-            <span class="badge badge-gold" id="profile-level">Nv. 1</span>
-          </div>
-          <div class="bio-text" id="profile-bio">—</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
-          <button class="btn btn-blue btn-sm hidden" id="btn-edit-profile" onclick="openEditProfile()">✏️ Editar Perfil</button>
-          <div id="admin-profile-actions" class="hidden" style="display:flex;gap:6px;"></div>
-        </div>
-      </div>
-
-      <!-- XP BAR -->
-      <div style="padding:0 22px 16px;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-          <span style="font-size:12px;font-weight:700;color:var(--text-light);">XP — Nível <span id="xp-level">1</span></span>
-          <span style="font-size:12px;font-weight:700;color:var(--text-mid);" id="xp-value">0 XP</span>
-        </div>
-        <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
-        <span style="font-size:10px;color:var(--text-light);margin-top:3px;display:block;" id="xp-next">Próximo nível: — XP</span>
-      </div>
-
-      <!-- STATS -->
-      <div class="stats-row">
-        <div class="glass-sm stat-card"><div class="num" id="stat-xp">0</div><div class="lbl">XP Total</div></div>
-        <div class="glass-sm stat-card"><div class="num" id="stat-posts">0</div><div class="lbl">Posts</div></div>
-        <div class="glass-sm stat-card"><div class="num" id="stat-conquistas">0</div><div class="lbl">Conquistas</div></div>
-        <div class="glass-sm stat-card"><div class="num" id="stat-rank">—</div><div class="lbl">Ranking</div></div>
-      </div>
-
-      <!-- TABS -->
-      <div class="profile-tabs">
-        <button class="ptab active" onclick="switchTab('conquistas',this)">🏆 Conquistas</button>
-        <button class="ptab" onclick="switchTab('fotos',this)">📷 Fotos Destaque</button>
-        <button class="ptab" onclick="switchTab('posts',this)">📰 Posts</button>
-        <button class="ptab" onclick="switchTab('meta',this)">🎯 Meta Pessoal</button>
-      </div>
-
-      <!-- TAB CONTENTS -->
-      <div class="tab-content" id="tab-conquistas">
-        <div class="conquistas-grid" id="conquistas-grid"></div>
-      </div>
-      <div class="tab-content hidden" id="tab-fotos">
-        <div class="fotos-grid" id="fotos-grid"></div>
-      </div>
-      <div class="tab-content hidden" id="tab-posts">
-        <div id="user-posts-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-      </div>
-      <div class="tab-content hidden" id="tab-meta">
-        <div id="meta-section"></div>
-      </div>
+  <div class="profile-layout" style="max-width:800px;margin:20px auto;padding:20px;">
+    <div class="glass" style="padding:30px;text-align:center;">
+      <div id="profile-header"></div>
+      <hr style="margin:20px 0;opacity:0.2;">
+      
+      <p class="section-title">🏆 Conquistas & Badges</p>
+      <div id="profile-badges" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;"></div>
+      
+      <hr style="margin:20px 0;opacity:0.2;">
+      <p class="section-title">📊 Estatísticas Mensais</p>
+      <div id="profile-stats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;"></div>
     </div>
   </div>
 
-  <!-- Edit Profile Modal -->
-  <div class="modal-overlay hidden" id="edit-modal">
-    <div class="glass modal-box">
-      <div class="modal-title">✏️ Editar Perfil <button class="modal-close" onclick="closeEditProfile()">✕</button></div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <label style="font-size:12px;font-weight:700;color:var(--text-light);">Nome</label>
-        <div class="input-wrap"><input type="text" id="edit-nome" class="aero-input" style="padding-left:14px;"></div>
-        <label style="font-size:12px;font-weight:700;color:var(--text-light);">Bio</label>
-        <textarea id="edit-bio" class="aero-textarea" placeholder="Fale um pouco sobre você..."></textarea>
-        <label style="font-size:12px;font-weight:700;color:var(--text-light);">Status / Humor</label>
-        <div class="input-wrap"><input type="text" id="edit-humor" class="aero-input" style="padding-left:14px;" placeholder="Ex: 😄 Fechando negócios!"></div>
-        <button class="btn btn-green w-full" onclick="saveProfile()">💾 Salvar Alterações</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="taskbar" class="glass"><div class="taskbar-time"></div><div class="taskbar-date"></div></div>
-
-  <script src="database.js"></script>
-  <script src="auth.js"></script>
   <script>
-    const params  = new URLSearchParams(window.location.search);
-    const viewUid = params.get('uid'); // null = own profile
-    let profileData = null;
-    let isOwnProfile = false;
+    const params = new URLSearchParams(window.location.search);
+    const viewUid = params.get('uid');
 
-    requireAuth(async userData => {
-      renderHeader('perfil');
+    window.requireAuth(async userData => {
       const targetUid = viewUid || userData.uid;
-      isOwnProfile = targetUid === userData.uid;
-
-      // Live listen profile
+      
       db.collection('usuarios').doc(targetUid).onSnapshot(doc => {
         if (!doc.exists) return;
-        profileData = { uid: doc.id, ...doc.data() };
-        renderProfile(profileData, userData);
+        const u = doc.data();
+        renderProfile(u);
       });
-
-      loadUserPosts(targetUid, userData);
-      loadConquistas(targetUid, userData);
-      loadFotosDestaque(targetUid, userData);
-      loadMetaPessoal(targetUid, userData);
-      loadRankPosition(targetUid, profileData?.tipo);
-      countPosts(targetUid);
     });
 
-    function renderProfile(u, me) {
-      document.getElementById('profile-name').textContent = u.nome;
-      document.getElementById('profile-bio').textContent  = u.bio || (isOwnProfile ? 'Clique em Editar para adicionar uma bio...' : 'Sem bio.');
-      document.getElementById('profile-tipo').textContent = u.tipo === 'interno' ? '🏢 Interno' : '🚀 Autônomo';
+    function renderProfile(u) {
+      document.getElementById('profile-header').innerHTML = `
+        ${renderAvatar(u, 'lg')}
+        <h1 style="font-size:24px;font-weight:900;margin-top:15px;">${u.nome}</h1>
+        <p style="color:var(--text-light);">${u.role} · ${u.tipo}</p>
+        <div style="margin-top:10px;font-size:14px;font-weight:700;color:var(--text-mid);">Nível ${xpToLevel(u.xp || 0)}</div>
+      `;
 
-      const si = u.status==='online' ? {cls:'status-online',lbl:'Online'} : u.status==='intervalo' ? {cls:'status-intervalo',lbl:'Intervalo'} : {cls:'status-offline',lbl:'Offline'};
-      document.getElementById('profile-status-chip').innerHTML = `<span class="status-dot ${si.cls}"></span><span>${si.lbl}</span>`;
-
-      const lv = xpToLevel(u.xp||0);
-      document.getElementById('profile-level').textContent = `Nv. ${lv.level}`;
-      document.getElementById('xp-level').textContent  = lv.level;
-      document.getElementById('xp-value').textContent  = `${u.xp||0} XP`;
-      document.getElementById('xp-bar').style.width    = lv.pct + '%';
-      document.getElementById('xp-next').textContent   = `Próximo nível: ${lv.nextXP} XP`;
-      document.getElementById('stat-xp').textContent   = u.xp||0;
-      document.getElementById('stat-conquistas').textContent = (u.conquistas||[]).length;
-
-      // Avatar
-      const ring = document.getElementById('avatar-ring');
-      const size = 90;
-      if (u.fotoPerfil) {
-        ring.querySelector('#avatar-display').innerHTML = `<img src="${u.fotoPerfil}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;">`;
-      } else {
-        const initials = u.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-        const cls = u.tipo==='interno'?'orb-blue':'orb-teal';
-        ring.querySelector('#avatar-display').innerHTML = `<div class="orb ${cls}" style="width:${size}px;height:${size}px;font-size:28px;">${initials}</div>`;
-      }
-
-      // Cover
-      if (u.fotoCapa) {
-        const ci = document.getElementById('cover-img');
-        ci.src = u.fotoCapa; ci.style.display = 'block';
-      }
-
-      // Show edit controls
-      if (isOwnProfile || me.role==='admin') {
-        document.getElementById('btn-edit-profile').classList.remove('hidden');
-        document.getElementById('btn-edit-cover').classList.remove('hidden');
-        document.getElementById('btn-edit-avatar').classList.remove('hidden');
-      }
-      if (me.role==='admin' && !isOwnProfile) {
-        renderAdminControls(u, me);
-      }
-    }
-
-    function renderAdminControls(u, me) {
-      const el = document.getElementById('admin-profile-actions');
-      el.classList.remove('hidden');
-      el.style.display = 'flex';
-      el.innerHTML = `
-        <button class="btn btn-gold btn-sm" onclick="openAddConquista('${u.uid}')">🏅 Dar Conquista</button>
-        <button class="btn btn-blue btn-sm" onclick="toggleLiderMes('${u.uid}',${!u.isLiderDoMes})">${u.isLiderDoMes?'👑 Remover Líder':'👑 Definir Líder'}</button>
-        <button class="btn ${u.aprovado?'btn-red':'btn-green'} btn-sm" onclick="toggleAprovado('${u.uid}',${!u.aprovado})">${u.aprovado?'🚫 Suspender':'✅ Aprovar'}</button>`;
-    }
-
-    async function toggleLiderMes(uid, val) {
-      if (val) await db.collection('usuarios').where('isLiderDoMes','==',true).get().then(s => s.forEach(d => d.ref.update({isLiderDoMes:false})));
-      await db.collection('usuarios').doc(uid).update({ isLiderDoMes: val });
-      showToast(val ? '👑 Líder do Mês definido!' : 'Líder removido.', 'info');
-    }
-    async function toggleAprovado(uid, val) {
-      await db.collection('usuarios').doc(uid).update({ aprovado: val });
-      showToast(val ? '✅ Usuário aprovado!' : '🚫 Usuário suspenso.', val?'success':'error');
-    }
-
-    // ── Conquistas ─────────────────────────────
-    async function loadConquistas(uid, me) {
-      const grid = document.getElementById('conquistas-grid');
-      // All available conquistas
-      const allSnap = await db.collection('conquistas').get();
-      const allConquistas = allSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-      db.collection('usuarios').doc(uid).onSnapshot(doc => {
-        const earned = doc.data().conquistas || [];
-        grid.innerHTML = '';
-        allConquistas.forEach(c => {
-          const hasIt = earned.find(e => e.id === c.id);
-          grid.innerHTML += `
-            <div class="glass-sm conquista-card ${hasIt?'':'conquista-locked'}" title="${c.descricao||''}">
-              <span class="icon">${c.icone||'🏅'}</span>
-              <span class="name">${c.nome}</span>
-              <span class="xp">+${c.xpBonus||0} XP</span>
-              ${hasIt ? `<span style="font-size:9px;color:var(--text-light);">${hasIt.dataGanhou?.toDate?.()?.toLocaleDateString('pt-BR')||'Obtida'}</span>` : '<span style="font-size:9px;color:var(--text-light);">Bloqueada</span>'}
+      // Render Badges
+      const badgesEl = document.getElementById('profile-badges');
+      badgesEl.innerHTML = '';
+      if (u.conquistas && u.conquistas.length > 0) {
+        u.conquistas.forEach(b => {
+          badgesEl.innerHTML += `
+            <div class="badge-${b.categoria}" style="padding:8px 16px;border-radius:25px;font-size:12px;font-weight:800;cursor:pointer;" title="${b.descricao}">
+              ${b.icone} ${b.nome}
             </div>`;
         });
-        if (allConquistas.length === 0) grid.innerHTML = '<p style="font-size:13px;color:var(--text-light);">Nenhuma conquista cadastrada ainda.</p>';
-      });
-    }
-
-    function openAddConquista(uid) {
-      db.collection('conquistas').get().then(snap => {
-        const opts = snap.docs.map(d => `<option value="${d.id}">${d.data().icone} ${d.data().nome}</option>`).join('');
-        const overlay = document.createElement('div');
-        overlay.className = 'modal-overlay';
-        overlay.innerHTML = `
-          <div class="glass modal-box">
-            <div class="modal-title">🏅 Dar Conquista <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button></div>
-            <select id="conquista-select" class="aero-select">${opts}</select>
-            <button class="btn btn-gold w-full mt-16" onclick="giveConquista('${uid}')">Conceder →</button>
-          </div>`;
-        document.body.appendChild(overlay);
-      });
-    }
-
-    async function giveConquista(uid) {
-      const cid = document.getElementById('conquista-select').value;
-      if (!cid) return;
-      const cDoc = await db.collection('conquistas').doc(cid).get();
-      const c = cDoc.data();
-      const uDoc = await db.collection('usuarios').doc(uid).get();
-      const earned = uDoc.data().conquistas || [];
-      if (earned.find(e => e.id === cid)) { showToast('Usuário já possui esta conquista.','error'); return; }
-      await db.collection('usuarios').doc(uid).update({
-        conquistas: firebase.firestore.FieldValue.arrayUnion({ id: cid, nome: c.nome, icone: c.icone, dataGanhou: new Date() })
-      });
-      if (c.xpBonus) await addXP(uid, c.xpBonus, `Conquista: ${c.nome}`);
-      document.querySelector('.modal-overlay').remove();
-      showToast(`🏅 Conquista "${c.nome}" concedida!`, 'success');
-    }
-
-    // ── Fotos destaque ─────────────────────────
-    function loadFotosDestaque(uid, me) {
-      db.collection('usuarios').doc(uid).onSnapshot(doc => {
-        const fotos = doc.data().fotosDestaque || [];
-        const grid  = document.getElementById('fotos-grid');
-        grid.innerHTML = '';
-        fotos.forEach((url, i) => {
-          grid.innerHTML += `
-            <div class="foto-item">
-              <img src="${url}" loading="lazy">
-              ${isOwnProfile || me.role==='admin' ? `<button style="position:absolute;top:4px;right:4px;background:rgba(255,0,0,.7);border:none;border-radius:50%;width:22px;height:22px;color:#fff;cursor:pointer;font-size:11px;" onclick="removeFotoDestaque('${uid}','${url}')">✕</button>` : ''}
-            </div>`;
-        });
-        if ((isOwnProfile || me.role==='admin') && fotos.length < 6) {
-          grid.innerHTML += `<label class="foto-add" title="Adicionar foto destaque"><input type="file" accept="image/*" style="display:none;" onchange="addFotoDestaque('${uid}',this)">📷</label>`;
-        }
-      });
-    }
-
-    async function addFotoDestaque(uid, input) {
-      const file = input.files[0]; if (!file) return;
-      if (file.size > 800*1024) { showToast('Imagem muito grande! Máx 800KB.','error'); return; }
-      const reader = new FileReader();
-      reader.onload = async e => {
-        await db.collection('usuarios').doc(uid).update({ fotosDestaque: firebase.firestore.FieldValue.arrayUnion(e.target.result) });
-        showToast('📷 Foto adicionada!','success');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function removeFotoDestaque(uid, url) {
-      await db.collection('usuarios').doc(uid).update({ fotosDestaque: firebase.firestore.FieldValue.arrayRemove(url) });
-      showToast('Foto removida.','info');
-    }
-
-    async function uploadAvatar(input) {
-      const file = input.files[0]; if (!file) return;
-      if (file.size > 500*1024) { showToast('Imagem muito grande! Máx 500KB.','error'); return; }
-      const reader = new FileReader();
-      reader.onload = async e => {
-        await db.collection('usuarios').doc(currentUser.uid).update({ fotoPerfil: e.target.result });
-        showToast('✅ Foto de perfil atualizada!','success');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function uploadCover(input) {
-      const file = input.files[0]; if (!file) return;
-      if (file.size > 1*1024*1024) { showToast('Imagem muito grande! Máx 1MB.','error'); return; }
-      const uid = viewUid || currentUser.uid;
-      const reader = new FileReader();
-      reader.onload = async e => {
-        await db.collection('usuarios').doc(uid).update({ fotoCapa: e.target.result });
-        showToast('✅ Capa atualizada!','success');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // ── Posts do usuário ───────────────────────
-    async function loadUserPosts(uid, me) {
-      db.collection('posts').where('autorUid','==',uid).orderBy('criadoEm','desc').limit(20)
-        .onSnapshot(snap => {
-          const el = document.getElementById('user-posts-list');
-          el.innerHTML = '';
-          snap.docs.forEach(doc => {
-            const p = doc.data();
-            el.innerHTML += `
-              <div class="glass-sm p-16">
-                <p style="font-size:13px;">${p.texto||'[Foto]'}</p>
-                ${p.fotoBase64?`<img src="${p.fotoBase64}" style="max-height:120px;border-radius:8px;margin-top:8px;" loading="lazy">` : ''}
-                <p style="font-size:11px;color:var(--text-light);margin-top:6px;">${p.criadoEm?.toDate?.()?.toLocaleString('pt-BR')||'Agora'}</p>
-              </div>`;
-          });
-          document.getElementById('stat-posts').textContent = snap.size;
-          if (snap.empty) el.innerHTML = '<p style="font-size:13px;color:var(--text-light);">Nenhum post ainda.</p>';
-        });
-    }
-
-    async function countPosts(uid) {
-      const snap = await db.collection('posts').where('autorUid','==',uid).get();
-      document.getElementById('stat-posts').textContent = snap.size;
-    }
-
-    async function loadRankPosition(uid, tipo) {
-      const snap = await db.collection('usuarios').where('aprovado','==',true).where('tipo','==',tipo||'interno').orderBy('xp','desc').get();
-      const pos  = snap.docs.findIndex(d => d.id === uid) + 1;
-      document.getElementById('stat-rank').textContent = pos ? `#${pos}` : '—';
-    }
-
-    // ── Meta pessoal ───────────────────────────
-    function loadMetaPessoal(uid, me) {
-      db.collection('metas').where('usuarioUid','==',uid).where('ativa','==',true)
-        .onSnapshot(snap => {
-          const el = document.getElementById('meta-section');
-          el.innerHTML = '';
-          if (snap.empty) {
-            el.innerHTML = '<p style="font-size:13px;color:var(--text-light);">Nenhuma meta ativa.</p>';
-            return;
-          }
-          snap.forEach(doc => {
-            const m = { id: doc.id, ...doc.data() };
-            const pct = Math.min(100, Math.round(((m.progresso||0)/m.objetivo)*100));
-            el.innerHTML += `
-              <div class="meta-personal">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                  <p style="font-size:15px;font-weight:900;">🎯 ${m.titulo}</p>
-                  ${me.role==='admin' ? `
-                    <div style="display:flex;gap:6px;">
-                      <button class="btn btn-blue btn-sm" onclick="updateMetaProgress('${m.id}',${m.progresso||0},${m.objetivo})">✏️ Progresso</button>
-                      <button class="btn btn-red btn-sm" onclick="deleteMeta('${m.id}','${uid}',${m.xpRecompensa})">🗑</button>
-                    </div>` : ''}
-                </div>
-                <p style="font-size:12px;color:var(--text-light);margin-bottom:8px;">${m.descricao||''}</p>
-                <div class="xp-bar-wrap" style="height:12px;"><div class="xp-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,#ffaa00,#ff6600);"></div></div>
-                <div style="display:flex;justify-content:space-between;margin-top:5px;">
-                  <span style="font-size:11px;color:var(--text-light);">${m.progresso||0} / ${m.objetivo}</span>
-                  <span style="font-size:11px;font-weight:800;color:#664400;">🏅 +${m.xpRecompensa} XP</span>
-                </div>
-              </div>`;
-          });
-        });
-    }
-
-    async function updateMetaProgress(metaId, current, max) {
-      const val = prompt(`Novo progresso (atual: ${current}, meta: ${max}):`, current);
-      if (val === null) return;
-      const num = parseInt(val);
-      if (isNaN(num)) return;
-      await db.collection('metas').doc(metaId).update({ progresso: num });
-      if (num >= max) {
-        const m = (await db.collection('metas').doc(metaId).get()).data();
-        await addXP(m.usuarioUid, m.xpRecompensa, `Meta concluída: ${m.titulo}`);
-        await db.collection('metas').doc(metaId).update({ ativa: false, concluidaEm: firebase.firestore.FieldValue.serverTimestamp() });
-        showToast(`🎉 Meta concluída! +${m.xpRecompensa} XP para ${m.usuarioNome}!`, 'success', 5000);
       } else {
-        showToast('Progresso atualizado!','success');
+        badgesEl.innerHTML = '<p style="font-size:13px;color:var(--text-light);">Nenhuma conquista ainda. Continue participando!</p>';
       }
-    }
 
-    async function deleteMeta(metaId, uid, xp) {
-      const ok = await showConfirm('Excluir esta meta?');
-      if (!ok) return;
-      await db.collection('metas').doc(metaId).delete();
-      showToast('Meta removida.','info');
-    }
-
-    // ── Edit profile ───────────────────────────
-    function openEditProfile() {
-      const u = profileData;
-      document.getElementById('edit-nome').value  = u.nome  || '';
-      document.getElementById('edit-bio').value   = u.bio   || '';
-      document.getElementById('edit-humor').value = u.humor || '';
-      document.getElementById('edit-modal').classList.remove('hidden');
-    }
-    function closeEditProfile() { document.getElementById('edit-modal').classList.add('hidden'); }
-
-    async function saveProfile() {
-      const uid = viewUid || currentUser.uid;
-      await db.collection('usuarios').doc(uid).update({
-        nome:  document.getElementById('edit-nome').value.trim(),
-        bio:   document.getElementById('edit-bio').value.trim(),
-        humor: document.getElementById('edit-humor').value.trim()
-      });
-      closeEditProfile();
-      showToast('✅ Perfil atualizado!','success');
-    }
-
-    // ── Tab switcher ───────────────────────────
-    function switchTab(name, btn) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.ptab').forEach(el => el.classList.remove('active'));
-      document.getElementById(`tab-${name}`).classList.remove('hidden');
-      btn.classList.add('active');
+      // Render Stats
+      document.getElementById('profile-stats').innerHTML = `
+        <div class="glass-sm" style="padding:15px;"><div style="font-size:20px;font-weight:900;">${u.xp || 0}</div><small>XP Mensal</small></div>
+        <div class="glass-sm" style="padding:15px;"><div style="font-size:20px;font-weight:900;">${u.postsCount || 0}</div><small>Posts</small></div>
+        <div class="glass-sm" style="padding:15px;"><div style="font-size:20px;font-weight:900;">${(u.conquistas || []).length}</div><small>Badges</small></div>
+      `;
     }
   </script>
 </body>

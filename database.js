@@ -1,9 +1,7 @@
 // ============================================
-// FRUTIGER AERO LÍDER — Firebase Config
-// VERSÃO COMPAT (CORRIGIDA)
+// FRUTIGER AERO LÍDER — Firebase Config & Logic
 // ============================================
 
-// Configuração Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDJT35OkIJE7nvdndaBcUzuPYIf3S0SbNo",
   authDomain: "frutigeraero-lider.firebaseapp.com",
@@ -14,44 +12,97 @@ const firebaseConfig = {
   measurementId: "G-999WRRZKF0"
 };
 
-// Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Serviços globais
 const auth = firebase.auth();
 const db = firebase.firestore();
-const analytics = firebase.analytics ? firebase.analytics() : null;
 
+// ── SISTEMA DE XP E RESET MENSAL ────────────────
 
-// ============================================
-// SISTEMA DE PRESENÇA
-// ============================================
+// Função para ganhar XP com controle de 24h para notificações
+async function addXP(uid, amount, reason) {
+  const userRef = db.collection('usuarios').doc(uid);
+  const now = new Date();
+  const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
+
+  await db.runTransaction(async (transaction) => {
+    const doc = await transaction.get(userRef);
+    if (!doc.exists) return;
+
+    const data = doc.data();
+    let newXP = (data.xp || 0) + amount;
+    let lastReset = data.lastResetMonth || "";
+
+    // Reset mensal: Se o mês mudou, o XP volta a 0 antes de somar o novo
+    if (lastReset !== currentMonth) {
+      newXP = amount;
+      transaction.update(userRef, { 
+        xp: newXP, 
+        lastResetMonth: currentMonth,
+        xpHistorico: firebase.firestore.FieldValue.arrayUnion({ month: lastReset, xp: data.xp || 0 })
+      });
+    } else {
+      transaction.update(userRef, { xp: newXP });
+    }
+
+    // Controle de notificações (silencioso por 24h)
+    const lastNotify = data.lastXPNotification?.toDate() || new Date(0);
+    const diffHours = (now - lastNotify) / (1000 * 60 * 60);
+
+    if (diffHours >= 24) {
+      // Aqui você pode disparar um alerta visual no front-end
+      console.log(`Notificação: Você ganhou ${amount} XP por ${reason}! Total: ${newXP}`);
+      transaction.update(userRef, { lastXPNotification: now });
+    }
+  });
+}
+
+// ── SISTEMA DE PRESENÇA ─────────────────────────
 
 auth.onAuthStateChanged(user => {
   if (!user) return;
-
   const userRef = db.collection('usuarios').doc(user.uid);
 
-  // Marca online
   userRef.update({
     status: 'online',
     ultimaVez: firebase.firestore.FieldValue.serverTimestamp()
   });
 
-  // Ao fechar aba
   window.addEventListener('beforeunload', () => {
-    userRef.update({
-      status: 'offline',
-      ultimaVez: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    userRef.update({ status: 'offline', ultimaVez: firebase.firestore.FieldValue.serverTimestamp() });
   });
 
-  // Quando aba perde foco
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-      userRef.update({ status: 'intervalo' });
-    } else {
-      userRef.update({ status: 'online' });
-    }
+    userRef.update({ status: document.visibilityState === 'hidden' ? 'intervalo' : 'online' });
   });
 });
+
+// ── UTILITÁRIOS DE GAMIFICAÇÃO ──────────────────
+
+function xpToLevel(xp) {
+  return Math.floor(Math.sqrt(xp / 10)) + 1;
+}
+
+function renderAvatar(u, size = 'md') {
+  const s = size === 'sm' ? '32px' : size === 'lg' ? '80px' : '48px';
+  const fontSize = size === 'sm' ? '14px' : size === 'lg' ? '32px' : '20px';
+  
+  if (u.fotoUrl) {
+    return `<img src="${u.fotoUrl}" style="width:${s};height:${s};border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+  }
+  
+  // Avatar fallback Frutiger Aero (Orb)
+  const colors = {
+    'MASTER': 'var(--orb-gold)',
+    'admin': 'var(--orb-pink)',
+    'INTERNO': 'var(--orb-blue)',
+    'CORRETOR': 'var(--orb-green)'
+  };
+  const bg = colors[u.role] || colors[u.tipo] || 'var(--orb-blue)';
+  
+  return `
+    <div class="orb" style="width:${s};height:${s};background:${bg};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:${fontSize};border:2px solid rgba(255,255,255,0.8);box-shadow:0 4px 12px rgba(0,0,0,0.15);position:relative;overflow:hidden;">
+      ${(u.nome || u.email || '?')[0].toUpperCase()}
+      <div style="position:absolute;top:10%;left:15%;width:40%;height:20%;background:rgba(255,255,255,0.4);border-radius:50%;filter:blur(2px);transform:rotate(-15deg);"></div>
+    </div>`;
+}
