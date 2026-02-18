@@ -9,27 +9,30 @@
 
 <div class="bg-sky"></div>
 
-<div class="glass" style="width:350px;margin:120px auto;padding:30px;">
-  <h2 style="text-align:center;margin-bottom:20px;">Login</h2>
+<div class="glass" style="width:380px;margin:120px auto;padding:30px;">
+  <h2 style="text-align:center;margin-bottom:20px;">Acesso</h2>
 
   <input type="email" id="email" placeholder="Email" class="aero-input" style="margin-bottom:10px;">
+
   <input type="password" id="password" placeholder="Senha" class="aero-input" style="margin-bottom:15px;">
 
-  <button id="btnLogin" class="btn btn-blue" style="width:100%;margin-bottom:10px;">Entrar</button>
-  <button id="btnRegister" class="btn btn-green" style="width:100%;">Criar Conta</button>
+  <select id="tipoUsuario" class="aero-select" style="margin-bottom:15px;">
+    <option value="">Selecione o tipo</option>
+    <option value="INTERNO">Funcionário Interno</option>
+    <option value="CORRETOR">Corretor</option>
+  </select>
+
+  <button id="btnLogin" class="btn btn-blue" style="width:100%;margin-bottom:10px;">
+    Entrar
+  </button>
+
+  <button id="btnRegister" class="btn btn-green" style="width:100%;">
+    Criar Conta
+  </button>
 </div>
 
-<script type="module">
-import { auth } from "./auth.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<!-- Apenas carrega o auth.js -->
+<script type="module" src="auth.js"></script>
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    window.location.href = "/faerolider/index.html";
-  }
-});
-</script>
-
-</script>
 </body>
 </html>
