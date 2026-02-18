@@ -189,7 +189,7 @@ requireAuth();
   <script>
     requireAuth(userData => {
       renderHeader('hub');
-      if (userData.role === 'admin') {
+      if (userData.role === 'MASTER') {
         document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
       }
       loadRanking();
