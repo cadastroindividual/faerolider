@@ -150,6 +150,16 @@ body{
   20%, 100% { transform: translateX(200%) rotate(45deg); }
 }
 
+/* Brilho dourado pulsante para badges lendárias */
+.badge-lendaria {
+  animation: gold-pulse 2s infinite ease-in-out;
+}
+
+@keyframes gold-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.6); }
+  50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.9); }
+}
+
 .badge-rara {
   background: linear-gradient(135deg, #e0c3fc 0%, #8e2de2 50%, #4a00e0 100%);
   border: 2px solid rgba(255,255,255,0.8);

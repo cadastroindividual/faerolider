@@ -19,8 +19,16 @@ const db = firebase.firestore();
 
 // ── SISTEMA DE XP E RESET MENSAL ────────────────
 
-// Função para ganhar XP com controle de 24h para notificações
+// Regras de ganho de XP
+const XP_RULES = {
+  POST: 20,
+  LIKE: 5,
+  COMMENT: 10,
+  CHALLENGE: 50
+};
+
 async function addXP(uid, amount, reason) {
+  if (!uid) return;
   const userRef = db.collection('usuarios').doc(uid);
   const now = new Date();
   const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
@@ -33,7 +41,7 @@ async function addXP(uid, amount, reason) {
     let newXP = (data.xp || 0) + amount;
     let lastReset = data.lastResetMonth || "";
 
-    // Reset mensal: Se o mês mudou, o XP volta a 0 antes de somar o novo
+    // Reset mensal automático
     if (lastReset !== currentMonth) {
       newXP = amount;
       transaction.update(userRef, { 
@@ -45,14 +53,13 @@ async function addXP(uid, amount, reason) {
       transaction.update(userRef, { xp: newXP });
     }
 
-    // Controle de notificações (silencioso por 24h)
+    // Notificação silenciosa (24h)
     const lastNotify = data.lastXPNotification?.toDate() || new Date(0);
     const diffHours = (now - lastNotify) / (1000 * 60 * 60);
 
     if (diffHours >= 24) {
-      // Aqui você pode disparar um alerta visual no front-end
-      console.log(`Notificação: Você ganhou ${amount} XP por ${reason}! Total: ${newXP}`);
-      transaction.update(userRef, { lastXPNotification: now });
+      // O front-end pode ouvir essa mudança e mostrar um toast
+      transaction.update(userRef, { lastXPNotification: now, pendingNotification: `Você acumulou XP por suas interações recentes! 🎉` });
     }
   });
 }
@@ -91,7 +98,6 @@ function renderAvatar(u, size = 'md') {
     return `<img src="${u.fotoUrl}" style="width:${s};height:${s};border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
   }
   
-  // Avatar fallback Frutiger Aero (Orb)
   const colors = {
     'MASTER': 'var(--orb-gold)',
     'admin': 'var(--orb-pink)',

@@ -14,58 +14,98 @@
     import { requireAuth } from "./auth.js";
     window.requireAuth = requireAuth;
   </script>
+  <style>
+    .adm-layout{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:14px 12px 90px;}
+    .adm-tabs{display:flex;gap:10px;margin-bottom:20px;justify-content:center;}
+    .admtab{padding:12px 24px;border-radius:50px;font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;border:none;background:rgba(255,255,255,.38);color:var(--text-light);transition:var(--trans);box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+    .admtab.active{background:linear-gradient(180deg,#55b8ff,#0088ee);color:#fff;box-shadow:0 4px 15px rgba(0,100,255,.35);}
+    .adm-section{display:none;} .adm-section.active{display:block;}
+    .user-row{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:16px;background:rgba(255,255,255,.5);border:1.5px solid rgba(255,255,255,.8);margin-bottom:10px;transition:var(--trans);}
+    .user-row:hover{background:rgba(255,255,255,.75);transform:translateY(-2px);}
+    .adm-form{padding:24px;margin-bottom:20px;display:flex;flex-direction:column;gap:15px;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+    .full-width{grid-column:1/-1;}
+  </style>
 </head>
 <body>
   <div class="bg-sky"></div>
+  <div class="aurora aurora-1"></div><div class="aurora aurora-2"></div><div class="aurora aurora-3"></div>
+
+  <header id="global-header" class="glass" style="margin: 14px 12px; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 100;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div class="orb" style="width: 40px; height: 40px; background: var(--orb-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">👑</div>
+      <h1 style="font-size: 18px; font-weight: 900; color: var(--text);">PAINEL DE CONTROLE MASTER</h1>
+    </div>
+    <button class="btn btn-blue" onclick="location.href='index.html'">Voltar ao Hub</button>
+  </header>
+
   <div class="adm-layout">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div class="orb orb-md orb-gold lider-destaque">👑</div>
-      <div><h1 style="font-size:20px;font-weight:900;">Painel de Controle MASTER</h1>
-        <p style="font-size:12px;color:var(--text-light);">Gerenciamento Total: Usuários, XP e Conquistas</p>
-      </div>
-    </div>
-
+    
     <div class="adm-tabs">
-      <button class="admtab active" onclick="switchTab('usuarios',this)">👥 Usuários</button>
-      <button class="admtab" onclick="switchTab('conquistas',this)">🏅 Conquistas</button>
-      <button class="admtab" onclick="switchTab('desafios',this)">⚡ Desafios</button>
+      <button class="admtab active" onclick="switchAdmTab('usuarios',this)">👥 Usuários</button>
+      <button class="admtab" onclick="switchAdmTab('conquistas',this)">🏅 Conquistas</button>
+      <button class="admtab" onclick="switchAdmTab('desafios',this)">⚡ Desafios</button>
+      <button class="admtab" onclick="switchAdmTab('metas',this)">🎯 Metas</button>
     </div>
 
-    <!-- GESTÃO DE USUÁRIOS -->
-    <div class="adm-section active glass" id="adm-usuarios" style="padding:20px;">
-      <p class="section-title">Aprovações Pendentes & Gestão</p>
+    <!-- USUÁRIOS -->
+    <div class="adm-section active glass" id="adm-usuarios" style="padding:24px;">
+      <p class="section-title">Gerenciar Equipe & Aprovações</p>
+      <div style="margin-bottom: 15px;">
+        <button class="btn btn-red btn-sm" onclick="resetAllXP()">⚠️ Resetar Todos os XP (Manual)</button>
+      </div>
       <div id="users-list"></div>
     </div>
 
-    <!-- GESTÃO DE CONQUISTAS -->
+    <!-- CONQUISTAS -->
     <div class="adm-section" id="adm-conquistas">
-      <div class="glass adm-form" style="padding:20px;margin-bottom:14px;">
+      <div class="glass adm-form">
         <p class="section-title">🏅 Criar Nova Conquista (Badge)</p>
         <div class="form-grid">
-          <input type="text" id="badge-nome" class="aero-input" placeholder="Nome da Conquista">
+          <input type="text" id="badge-nome" class="aero-input" placeholder="Nome da Conquista (ex: Sniper do PME)">
           <select id="badge-categoria" class="aero-select">
             <option value="comum">🔵 Comum (Aero/Vidro)</option>
             <option value="rara">🟣 Rara (Roxo Neon)</option>
             <option value="lendaria">🏆 Lendária (Dourado Brilhante)</option>
           </select>
-          <input type="text" id="badge-icone" class="aero-input" placeholder="Emoji (ex: 🏆)">
+          <input type="text" id="badge-icone" class="aero-input" placeholder="Emoji (ex: 🎯)">
+          <input type="number" id="badge-xp" class="aero-input" placeholder="XP Bônus (opcional)">
           <textarea id="badge-desc" class="aero-textarea full-width" placeholder="Descrição da conquista..."></textarea>
         </div>
-        <button class="btn btn-green mt-16" onclick="saveBadge()">Salvar Conquista</button>
+        <button class="btn btn-green" onclick="saveBadge()">+ Criar e Salvar Conquista</button>
+        <button class="btn btn-blue mt-10" onclick="seedDefaultBadges()" style="margin-top:10px;">✨ Gerar Conquistas Padrão</button>
       </div>
-      <div id="badges-list" class="glass" style="padding:20px;"></div>
+      <div class="glass" style="padding:24px;">
+        <p class="section-title">Lista de Conquistas</p>
+        <div id="badges-list" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+      </div>
     </div>
 
-    <!-- GESTÃO DE DESAFIOS -->
+    <!-- DESAFIOS -->
     <div class="adm-section" id="adm-desafios">
-       <div class="glass adm-form" style="padding:20px;">
+      <div class="glass adm-form">
         <p class="section-title">⚡ Lançar Desafio Relâmpago</p>
-        <input type="text" id="d-titulo" class="aero-input mb-10" placeholder="Título do Desafio">
-        <textarea id="d-desc" class="aero-textarea mb-10" placeholder="Descrição e regras..."></textarea>
+        <input type="text" id="d-titulo" class="aero-input" placeholder="Título do Desafio">
+        <textarea id="d-desc" class="aero-textarea" placeholder="Descrição e regras para o Feed..."></textarea>
         <input type="number" id="d-xp" class="aero-input" placeholder="XP Recompensa">
-        <button class="btn btn-blue mt-16" onclick="createDesafio()">Lançar no Feed</button>
+        <button class="btn btn-blue" onclick="createDesafio()">Lançar Desafio no Feed</button>
       </div>
     </div>
+
+    <!-- METAS -->
+    <div class="adm-section" id="adm-metas">
+      <div class="glass adm-form">
+        <p class="section-title">🎯 Definir Meta Pessoal</p>
+        <div class="form-grid">
+          <select id="m-usuario" class="aero-select"></select>
+          <input type="text" id="m-titulo" class="aero-input" placeholder="Título da Meta">
+          <input type="number" id="m-obj" class="aero-input" placeholder="Objetivo (número)">
+          <input type="number" id="m-xp" class="aero-input" placeholder="XP se completar">
+        </div>
+        <button class="btn btn-gold" onclick="createMeta()">🎯 Atribuir Meta</button>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -79,9 +119,10 @@
       currentUser = userData;
       loadUsers();
       loadBadges();
+      loadUsersForSelect();
     });
 
-    function switchTab(name, btn) {
+    function switchAdmTab(name, btn) {
       document.querySelectorAll('.adm-section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.admtab').forEach(el => el.classList.remove('active'));
       document.getElementById(`adm-${name}`).classList.add('active');
@@ -95,17 +136,21 @@
         snap.forEach(doc => {
           const u = doc.data();
           const uid = doc.id;
+          const statusSi = u.status==='online'?{cls:'status-online',lbl:'Online'}:u.status==='intervalo'?{cls:'status-intervalo',lbl:'Intervalo'}:{cls:'status-offline',lbl:'Offline'};
+          
           el.innerHTML += `
-            <div class="user-row glass-sm" style="padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+            <div class="user-row">
               ${renderAvatar(u, 'sm')}
               <div style="flex:1">
-                <strong>${u.nome}</strong> (${u.role})<br>
-                <small>${u.email} · ${u.xp || 0} XP · ${u.aprovado ? '✅ Aprovado' : '⏳ PENDENTE'}</small>
+                <strong style="font-size:14px;">${u.nome}</strong> 
+                <span class="badge-comum" style="font-size:10px; padding:2px 8px;">${u.role}</span>
+                <br><small style="color:var(--text-light);">${u.email} · ${u.xp || 0} XP · ${u.aprovado ? '✅ Aprovado' : '⏳ PENDENTE'}</small>
               </div>
-              <div>
-                ${!u.aprovado ? `<button class="btn btn-green btn-sm" onclick="approveUser('${uid}')">Aprovar</button>` : ''}
-                <button class="btn btn-blue btn-sm" onclick="grantBadgePrompt('${uid}')">Badge</button>
-                <button class="btn btn-gold btn-sm" onclick="setLeader('${uid}', '${u.tipo}')">👑 Líder</button>
+              <div style="display:flex; gap:6px;">
+                ${!u.aprovado ? `<button class="btn btn-green btn-sm" style="padding:6px 12px; font-size:11px;" onclick="approveUser('${uid}')">Aprovar</button>` : ''}
+                <button class="btn btn-blue btn-sm" style="padding:6px 12px; font-size:11px;" onclick="grantBadgePrompt('${uid}')">Badge</button>
+                <button class="btn btn-gold btn-sm" style="padding:6px 12px; font-size:11px;" onclick="setLeader('${uid}', '${u.tipo}')">👑 Líder</button>
+                ${u.role === 'USER' ? `<button class="btn btn-pink btn-sm" style="padding:6px 12px; font-size:11px;" onclick="promoteAdmin('${uid}')">Admin</button>` : ''}
               </div>
             </div>`;
         });
@@ -114,16 +159,35 @@
 
     async function approveUser(uid) {
       await db.collection('usuarios').doc(uid).update({ aprovado: true });
-      alert("Usuário aprovado com sucesso!");
+      alert("Usuário aprovado!");
+    }
+
+    async function promoteAdmin(uid) {
+      if(confirm("Promover este usuário a Admin?")) {
+        await db.collection('usuarios').doc(uid).update({ role: 'admin' });
+        alert("Usuário promovido!");
+      }
+    }
+
+    async function resetAllXP() {
+      if(!confirm("TEM CERTEZA? Isso resetará o XP de TODOS os usuários para 0!")) return;
+      const snap = await db.collection('usuarios').get();
+      const batch = db.batch();
+      const now = new Date();
+      const monthStr = `${now.getFullYear()}-${now.getMonth() + 1}`;
+      
+      snap.forEach(d => {
+        batch.update(d.ref, { xp: 0, lastResetMonth: monthStr });
+      });
+      await batch.commit();
+      alert("Todos os XP foram resetados!");
     }
 
     async function setLeader(uid, tipo) {
       const field = tipo === 'INTERNO' ? 'liderInterno' : 'liderCorretor';
-      // Limpa líder anterior
       const snap = await db.collection('usuarios').where(field, '==', true).get();
       const batch = db.batch();
       snap.forEach(d => batch.update(d.ref, { [field]: false }));
-      // Seta novo
       batch.update(db.collection('usuarios').doc(uid), { [field]: true });
       await batch.commit();
       alert("Líder do Mês atualizado!");
@@ -134,25 +198,56 @@
       const cat = document.getElementById('badge-categoria').value;
       const icone = document.getElementById('badge-icone').value;
       const desc = document.getElementById('badge-desc').value;
+      const xp = parseInt(document.getElementById('badge-xp').value) || 0;
       
-      await db.collection('conquistas').add({ nome, categoria: cat, icone, descricao: desc });
+      if(!nome || !icone) return alert("Preencha nome e ícone!");
+      await db.collection('conquistas').add({ nome, categoria: cat, icone, descricao: desc, xpBonus: xp });
       alert("Conquista criada!");
+    }
+
+    async function seedDefaultBadges() {
+      const defaultBadges = [
+        { nome: "Líder de Líderes", categoria: "lendaria", icone: "🏆", descricao: "Mais de 3 anos de casa. O veterano supremo." },
+        { nome: "Estrategista Hapvida", categoria: "lendaria", icone: "🎯", descricao: "Para quem desenha as melhores estratégias de vendas." },
+        { nome: "Futuro Presidente", categoria: "lendaria", icone: "👑", descricao: "A cadeira da presidência te espera." },
+        { nome: "Agilidade em Pessoa", categoria: "rara", icone: "⚡", descricao: "O ADM mais rápido no gatilho do sistema." },
+        { nome: "Sniper do PME", categoria: "rara", icone: "🎯", descricao: "Não perde um contrato de Pequenas e Médias Empresas." },
+        { nome: "Mestre do Fechamento", categoria: "rara", icone: "🤝", descricao: "Conssegue o 'sim' do cliente até nas situações impossíveis." },
+        { nome: "Anjo da Guarda", categoria: "rara", icone: "😇", descricao: "Sempre para o que está fazendo para ajudar um colega." },
+        { nome: "Festa da Firma", categoria: "comum", icone: "🥳", descricao: "O primeiro a confirmar presença em qualquer evento social." },
+        { nome: "Cafeineiro Oficial", categoria: "comum", icone: "☕", descricao: "Move-se a base de café. A xícara é parte do corpo." },
+        { nome: "Dono do Feed", categoria: "comum", icone: "📱", descricao: "O rei da interatividade, posta e comenta em tudo." },
+        { nome: "Madrugador Supimpa", categoria: "comum", icone: "🌅", descricao: "O primeiro a dar 'Bom dia' no sistema todos os dias." },
+        { nome: "Inimigo da Pendência", categoria: "comum", icone: "🛡️", descricao: "Não dorme enquanto tiver um processo parado." },
+        { nome: "DJ do Setor", categoria: "comum", icone: "🎵", descricao: "Responsável pela energia e animação do ambiente." },
+        { nome: "Rindo do Perigo", categoria: "comum", icone: "😂", descricao: "Mantém o bom humor mesmo no fechamento sob pressão." }
+      ];
+      
+      if(!confirm("Deseja gerar as 14 conquistas padrão?")) return;
+      const batch = db.batch();
+      defaultBadges.forEach(b => {
+        const ref = db.collection('conquistas').doc();
+        batch.set(ref, b);
+      });
+      await batch.commit();
+      alert("Conquistas padrão geradas com sucesso!");
     }
 
     async function loadBadges() {
       db.collection('conquistas').onSnapshot(snap => {
         const el = document.getElementById('badges-list');
-        el.innerHTML = '<p class="section-title">Conquistas Cadastradas</p>';
+        el.innerHTML = '';
         snap.forEach(doc => {
           const b = doc.data();
-          el.innerHTML += `<div class="badge-${b.categoria}" style="padding:5px 12px;border-radius:20px;display:inline-block;margin:5px;font-size:12px;">${b.icone} ${b.nome}</div>`;
+          el.innerHTML += `<div class="badge-${b.categoria}">${b.icone} ${b.nome}</div>`;
         });
       });
     }
 
     async function grantBadgePrompt(uid) {
       const snap = await db.collection('conquistas').get();
-      let list = "Escolha o ID da conquista:\n";
+      if(snap.empty) return alert("Nenhuma conquista criada ainda.");
+      let list = "Escolha o número da conquista:\n";
       const badges = [];
       snap.forEach(d => {
         badges.push({id: d.id, ...d.data()});
@@ -165,6 +260,15 @@
         });
         alert("Conquista concedida!");
       }
+    }
+
+    async function loadUsersForSelect() {
+      const snap = await db.collection('usuarios').where('aprovado','==',true).get();
+      const sel = document.getElementById('m-usuario');
+      sel.innerHTML = '<option value="">Selecione o usuário</option>';
+      snap.forEach(d => {
+        sel.innerHTML += `<option value="${d.id}">${d.data().nome}</option>`;
+      });
     }
   </script>
 </body>
