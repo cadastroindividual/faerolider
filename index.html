@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRUTIGER AERO LÍDER</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <div id="login-screen" class="glass-modal">
+        <div class="login-box">
+            <h1>FRUTIGER AERO LÍDER</h1>
+            <p>Acesse o Hub Social da Corretora</p>
+            <input type="email" id="login-email" placeholder="E-mail">
+            <input type="password" id="login-pass" placeholder="Senha">
+            <button id="btn-entrar" class="glossy-button">Entrar no Sistema</button>
+            <p id="login-error" class="error-msg"></p>
+        </div>
+    </div>
+
+    <div id="app-content" style="display: none;">
+        <header class="glass-header">
+            <div class="logo">FRUTIGER AERO LÍDER</div>
+            <div class="nav-right">
+                <span id="user-welcome">Olá, Usuário!</span>
+                <div class="nav-icons">
+                    <button class="icon-btn">✉️</button>
+                    <button class="icon-btn">🔔</button>
+                    <button id="btn-logout" class="icon-btn logout">🚪</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="hub-layout">
+            <section id="tool-menu" class="tools-sidebar glass">
+                <h3>Ferramentas</h3>
+                <div class="icon-grid" id="hub-icons">
+                    <div class="tool-item">📂 Cadastro</div>
+                    <div class="tool-item">📊 Relatórios</div>
+                    <div class="tool-item">📋 Cotação</div>
+                    <div id="admin-tool" class="tool-item admin-only" style="display:none;">⚙️ PAINEL ADM</div>
+                </div>
+            </section>
+
+            <section class="rankings-container">
+                <div class="rank-box glass">
+                    <h2>🏆 Equipe Interna (ADM)</h2>
+                    <div id="rank-internos" class="rank-list"></div>
+                </div>
+                <div class="rank-box glass">
+                    <h2>🚀 Corretores Autônomos</h2>
+                    <div id="rank-autonomos" class="rank-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="auth.js"></script>
+    <script src="hub.js"></script>
+</body>
+</html>
