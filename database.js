@@ -1,4 +1,4 @@
-// CONFIGURAÇÃO DO FIREBASE - SUBSTITUA PELOS SEUS DADOS
+// CONFIGURAÇÃO DO FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyDVAf8N6g6zD8VR_TPzQKMsA-eIGQuT0AQ",
   authDomain: "frutiger-aero-lider.firebaseapp.com",
@@ -10,6 +10,9 @@ const firebaseConfig = {
   measurementId: "G-G6XZTKFXM8"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// Inicialização correta para a biblioteca "Compat" que está no HTML
+firebase.initializeApp(firebaseConfig);
+
+// Definindo as variáveis que os outros arquivos (auth.js e hub.js) vão usar
+const auth = firebase.auth();
+const db = firebase.firestore();
