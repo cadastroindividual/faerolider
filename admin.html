@@ -50,7 +50,7 @@
   <div class="adm-layout">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       <div class="orb orb-md orb-pink">⚙️</div>
-      <div><h1 style="font-size:20px;font-weight:900;">Painel Administrativo</h1>
+      <div><h1 style="font-size:20px;font-weight:900;">Painel MASTERistrativo</h1>
         <p style="font-size:12px;color:var(--text-light);">Gerencie usuários, conquistas, desafios e metas</p>
       </div>
     </div>
@@ -190,8 +190,8 @@
     let allUsersAdm = [];
 
     requireAuth(async userData => {
-      if (userData.role !== 'admin') { window.location.href='index.html'; return; }
-      renderHeader('admin');
+      if (userData.role !== 'MASTER') { window.location.href='index.html'; return; }
+      renderHeader('MASTER');
       loadUsers();
       loadConquistasAdm();
       loadDesafiosAdm();
@@ -231,13 +231,13 @@
           <div class="user-row">
             ${renderAvatar(u,'sm')}
             <div class="user-row-info">
-              <strong>${u.nome}</strong> <span class="badge ${u.role==='admin'?'badge-gold':u.tipo==='interno'?'badge-blue':'badge-green'}">${u.role==='admin'?'👑 Admin':u.tipo==='interno'?'Interno':'Autônomo'}</span>
+              <strong>${u.nome}</strong> <span class="badge ${u.role==='MASTER'?'badge-gold':u.tipo==='interno'?'badge-blue':'badge-green'}">${u.role==='MASTER'?'👑 MASTER':u.tipo==='interno'?'Interno':'Autônomo'}</span>
               <br><small>${u.email} · <span class="status-dot ${statusSi.cls}" style="display:inline-block;"></span> ${statusSi.lbl} · ${u.xp||0} XP · ${u.aprovado?'✅ Aprovado':'⏳ Pendente'}</small>
             </div>
             <div class="user-row-actions">
               <a href="perfil.html?uid=${u.uid}" class="btn btn-blue btn-sm">👤 Perfil</a>
               ${!u.aprovado ? `<button class="btn btn-green btn-sm" onclick="aprovarUser('${u.uid}')">✅ Aprovar</button>` : ''}
-              ${u.role!=='admin' ? `<button class="btn btn-gold btn-sm" onclick="setAdmin('${u.uid}',true)">👑 Tornar Admin</button>` : `<button class="btn btn-sm" style="background:rgba(255,200,0,.2);border:1px solid rgba(255,200,0,.4);" onclick="setAdmin('${u.uid}',false)">Remover Admin</button>`}
+              ${u.role!=='MASTER' ? `<button class="btn btn-gold btn-sm" onclick="setMASTER('${u.uid}',true)">👑 Tornar MASTER</button>` : `<button class="btn btn-sm" style="background:rgba(255,200,0,.2);border:1px solid rgba(255,200,0,.4);" onclick="setMASTER('${u.uid}',false)">Remover MASTER</button>`}
               <button class="btn btn-red btn-sm" onclick="deleteUser('${u.uid}','${u.email}')">🗑</button>
             </div>
           </div>`;
@@ -249,11 +249,11 @@
       await db.collection('usuarios').doc(uid).update({ aprovado: true });
       showToast('✅ Usuário aprovado!','success');
     }
-    async function setAdmin(uid, val) {
-      const ok = await showConfirm(val ? 'Tornar este usuário ADMIN?' : 'Remover permissão de Admin?');
+    async function setMASTER(uid, val) {
+      const ok = await showConfirm(val ? 'Tornar este usuário MASTER?' : 'Remover permissão de MASTER?');
       if (!ok) return;
-      await db.collection('usuarios').doc(uid).update({ role: val ? 'admin' : 'user' });
-      showToast(val ? '👑 Admin definido!' : 'Admin removido.','info');
+      await db.collection('usuarios').doc(uid).update({ role: val ? 'MASTER' : 'user' });
+      showToast(val ? '👑 MASTER definido!' : 'MASTER removido.','info');
     }
     async function deleteUser(uid, email) {
       const ok = await showConfirm(`Excluir usuário ${email}? Isso não remove a conta do Firebase Auth.`);
