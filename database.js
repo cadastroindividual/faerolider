@@ -1,7 +1,9 @@
 // ============================================
-// FRUTIGER AERO LÍDER — Firebase Config (COMPAT)
+// FRUTIGER AERO LÍDER — Firebase Config
+// VERSÃO COMPAT (CORRIGIDA)
 // ============================================
 
+// Configuração Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDJT35OkIJE7nvdndaBcUzuPYIf3S0SbNo",
   authDomain: "frutigeraero-lider.firebaseapp.com",
@@ -12,35 +14,44 @@ const firebaseConfig = {
   measurementId: "G-999WRRZKF0"
 };
 
-// Init
+// Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
-firebase.analytics();
 
-// Globals
+// Serviços globais
 const auth = firebase.auth();
-const db   = firebase.firestore();
+const db = firebase.firestore();
+const analytics = firebase.analytics ? firebase.analytics() : null;
 
-// ── Presença ────────────────────────────────
+
+// ============================================
+// SISTEMA DE PRESENÇA
+// ============================================
+
 auth.onAuthStateChanged(user => {
   if (!user) return;
 
-  const ref = db.collection('usuarios').doc(user.uid);
+  const userRef = db.collection('usuarios').doc(user.uid);
 
-  ref.update({
+  // Marca online
+  userRef.update({
     status: 'online',
     ultimaVez: firebase.firestore.FieldValue.serverTimestamp()
   });
 
+  // Ao fechar aba
   window.addEventListener('beforeunload', () => {
-    ref.update({
+    userRef.update({
       status: 'offline',
       ultimaVez: firebase.firestore.FieldValue.serverTimestamp()
     });
   });
 
+  // Quando aba perde foco
   document.addEventListener('visibilitychange', () => {
-    ref.update({
-      status: document.visibilityState === 'hidden' ? 'intervalo' : 'online'
-    });
+    if (document.visibilityState === 'hidden') {
+      userRef.update({ status: 'intervalo' });
+    } else {
+      userRef.update({ status: 'online' });
+    }
   });
 });
