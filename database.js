@@ -10,9 +10,9 @@ const firebaseConfig = {
   measurementId: "G-G6XZTKFXM8"
 };
 
-// Inicialização correta para a biblioteca "Compat" que está no HTML
+// FORMA CORRETA DE INICIALIZAR (Padrão Compat)
 firebase.initializeApp(firebaseConfig);
 
-// Definindo as variáveis que os outros arquivos (auth.js e hub.js) vão usar
+// Criando os atalhos para usar nos outros arquivos
 const auth = firebase.auth();
 const db = firebase.firestore();
