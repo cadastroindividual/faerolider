@@ -17,25 +17,24 @@
 </head>
 <body>
   <div class="bg-sky"></div>
-  <div class="aurora aurora-1"></div><div class="aurora aurora-2"></div><div class="aurora aurora-3"></div>
+  <div class="aurora aurora-1"></div><div class="aurora aurora-2"></div>
 
-  <header id="global-header" class="glass" style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 100;">
-    <div style="display: flex; align-items: center; gap: 12px;">
-      <div class="orb" style="width: 40px; height: 40px; background: var(--orb-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">🫧</div>
-      <h1 style="font-size: 18px; font-weight: 900; color: var(--text);">FRUTIGER AERO LÍDER</h1>
+  <header id="global-header" class="glass">
+    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" id="logo-trigger">
+      <div class="orb" style="width: 40px; height: 40px; background: var(--orb-blue); display: flex; align-items: center; justify-content: center; font-size: 20px;">🫧</div>
+      <h1 style="font-size: 18px; font-weight: 900;">FRUTIGER AERO LÍDER</h1>
     </div>
     
     <div style="display:flex; align-items:center; gap:20px;">
       <div id="master-gear" class="hidden">
-        <button class="orb" style="width:36px;height:36px;background:var(--orb-pink);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 10px rgba(0,0,0,0.1);" onclick="location.href='admin.html'">⚙️</button>
+        <button class="orb" style="width:36px;height:36px;background:var(--orb-pink);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;" onclick="location.href='admin.html'">⚙️</button>
       </div>
-      <div id="user-header"></div>
+      <div id="user-header" style="display:flex; align-items:center; gap:12px;"></div>
     </div>
   </header>
 
   <div class="hub-layout">
-    
-    <!-- LEFT SIDEBAR -->
+    <!-- LEFT -->
     <aside class="glass" style="padding: 20px; height: fit-content;">
       <p class="section-title">⚡ Ferramentas</p>
       <button class="tool-btn" onclick="location.href='feed.html'">📰 Feed Social</button>
@@ -50,10 +49,8 @@
       </div>
     </aside>
 
-    <!-- CENTER CONTENT -->
+    <!-- CENTER -->
     <section style="display: flex; flex-direction: column; gap: 20px;">
-      
-      <!-- RANKING BANNER -->
       <div class="glass" style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
         <div>
           <h2 style="font-size: 18px; font-weight: 900;">🏆 Ranking de Performance</h2>
@@ -65,7 +62,6 @@
         </div>
       </div>
 
-      <!-- RANK COLUMNS -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div class="glass" style="padding: 20px;">
           <p class="section-title">🏢 Equipe Interna</p>
@@ -76,39 +72,50 @@
           <div id="rank-corretor" style="display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
       </div>
-
     </section>
 
-    <!-- RIGHT SIDEBAR -->
+    <!-- RIGHT -->
     <aside style="display: flex; flex-direction: column; gap: 20px;">
-      
-      <!-- DESTAQUE LÍDERES -->
       <div id="lider-interno-card-wrap"></div>
       <div id="lider-corretor-card-wrap"></div>
-
-      <!-- FEED PREVIEW -->
       <div class="glass" style="padding: 20px;">
         <p class="section-title">📣 Feed Recente</p>
         <div id="feed-preview" style="display: flex; flex-direction: column; gap: 12px;"></div>
         <button class="btn btn-blue" style="width: 100%; margin-top: 15px; font-size: 13px;" onclick="location.href='feed.html'">Ver Feed Completo →</button>
       </div>
-
     </aside>
   </div>
 
   <script>
+    let clickCount = 0;
+    let currentUserData = null;
+
+    // Mecanismo de Emergência: 5 cliques na bolha para forçar acesso MASTER
+    document.getElementById('logo-trigger').addEventListener('click', () => {
+      clickCount++;
+      if (clickCount >= 5) {
+        if(confirm("Deseja ativar o Painel MASTER para este usuário?")) {
+          db.collection('usuarios').doc(firebase.auth().currentUser.uid).update({ role: 'MASTER', aprovado: true })
+            .then(() => location.reload());
+        }
+        clickCount = 0;
+      }
+      setTimeout(() => { clickCount = 0; }, 3000);
+    });
+
     window.requireAuth(userData => {
+      currentUserData = userData;
       document.getElementById('user-header').innerHTML = `
-        <div style="display: flex; align-items: center; gap: 12px; text-align: right;">
-          <div>
-            <span style="display: block; font-size: 14px; font-weight: 800;">${userData.nome}</span>
-            <small style="color: var(--text-light); font-size: 11px;">${userData.role} · ${userData.xp || 0} XP</small>
-          </div>
-          <a href="perfil.html" style="text-decoration:none;">${renderAvatar(userData, 'sm')}</a>
+        <div style="text-align: right;">
+          <span style="display: block; font-size: 14px; font-weight: 800;">${userData.nome}</span>
+          <small style="color: var(--text-light); font-size: 11px;">${userData.role} · ${userData.xp || 0} XP</small>
         </div>
+        <a href="perfil.html" style="text-decoration:none;">${renderAvatar(userData, 'sm')}</a>
       `;
       
-      if (userData.role === 'MASTER' || userData.role === 'admin') {
+      // Lógica MASTER Robusta
+      const isMaster = userData.role === 'MASTER' || userData.role === 'admin';
+      if (isMaster) {
         document.getElementById('master-tools').classList.remove('hidden');
         document.getElementById('master-gear').classList.remove('hidden');
       }
@@ -120,102 +127,72 @@
     });
 
     function loadRankings() {
-      // Interno
       db.collection('usuarios').where('tipo','==','INTERNO').where('aprovado','==',true).orderBy('xp','desc').limit(5).onSnapshot(snap => {
         const el = document.getElementById('rank-interno');
         el.innerHTML = '';
-        if(snap.empty) el.innerHTML = '<p style="font-size:12px; color:var(--text-light);">Aguardando dados...</p>';
         snap.forEach((doc, i) => {
           const u = doc.data();
           const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
-          el.innerHTML += `
-            <a href="perfil.html?uid=${doc.id}" class="glass-sm" style="padding: 12px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; transition: var(--trans);">
-              <span style="font-weight: 900; width: 25px; font-size: 14px;">${medal}</span>
-              ${renderAvatar(u, 'sm')}
-              <strong style="font-size: 14px; flex: 1;">${u.nome}</strong>
-              <span class="badge-comum" style="font-size: 11px;">${u.xp || 0} XP</span>
-            </a>`;
+          el.innerHTML += `<a href="perfil.html?uid=${doc.id}" class="glass-sm" style="padding: 12px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;">
+            <span style="font-weight: 900; width: 25px;">${medal}</span>
+            ${renderAvatar(u, 'sm')}
+            <strong style="font-size: 14px; flex: 1;">${u.nome}</strong>
+            <span class="badge-comum">${u.xp || 0} XP</span>
+          </a>`;
         });
       });
 
-      // Corretor
       db.collection('usuarios').where('tipo','==','CORRETOR').where('aprovado','==',true).orderBy('xp','desc').limit(5).onSnapshot(snap => {
         const el = document.getElementById('rank-corretor');
         el.innerHTML = '';
-        if(snap.empty) el.innerHTML = '<p style="font-size:12px; color:var(--text-light);">Aguardando dados...</p>';
         snap.forEach((doc, i) => {
           const u = doc.data();
           const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
-          el.innerHTML += `
-            <a href="perfil.html?uid=${doc.id}" class="glass-sm" style="padding: 12px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; transition: var(--trans);">
-              <span style="font-weight: 900; width: 25px; font-size: 14px;">${medal}</span>
-              ${renderAvatar(u, 'sm')}
-              <strong style="font-size: 14px; flex: 1;">${u.nome}</strong>
-              <span class="badge-comum" style="font-size: 11px;">${u.xp || 0} XP</span>
-            </a>`;
+          el.innerHTML += `<a href="perfil.html?uid=${doc.id}" class="glass-sm" style="padding: 12px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;">
+            <span style="font-weight: 900; width: 25px;">${medal}</span>
+            ${renderAvatar(u, 'sm')}
+            <strong style="font-size: 14px; flex: 1;">${u.nome}</strong>
+            <span class="badge-comum">${u.xp || 0} XP</span>
+          </a>`;
         });
       });
     }
 
     function loadLideres() {
-      // Funcionário do Mês
-      db.collection('usuarios').where('liderInterno','==',true).limit(1).onSnapshot(snap => {
-        const wrap = document.getElementById('lider-interno-card-wrap');
-        if (snap.empty) { 
-          wrap.innerHTML = '<div class="glass" style="padding: 20px; text-align: center; color: var(--text-light);"><p class="section-title">⭐ Funcionário do Mês</p><p style="font-size:12px;">Aguardando definição...</p></div>'; 
-          return; 
-        }
-        const u = snap.docs[0].data();
-        wrap.innerHTML = `
-          <div class="glass lider-destaque" style="padding: 25px; text-align: center;">
-            <p class="section-title">⭐ Funcionário do Mês</p>
+      const loadLider = (field, title, wrapId, badge) => {
+        db.collection('usuarios').where(field,'==',true).limit(1).onSnapshot(snap => {
+          const wrap = document.getElementById(wrapId);
+          if (snap.empty) { 
+            wrap.innerHTML = `<div class="glass" style="padding: 20px; text-align: center; opacity: 0.6;"><p class="section-title">${title}</p><small>Aguardando...</small></div>`; 
+            return; 
+          }
+          const u = snap.docs[0].data();
+          wrap.innerHTML = `<div class="glass lider-destaque" style="padding: 25px; text-align: center;">
+            <p class="section-title">${title}</p>
             ${renderAvatar(u, 'lg')}
             <h3 style="margin-top: 15px; font-size: 18px; font-weight: 900;">${u.nome}</h3>
-            <p style="font-size: 12px; color: var(--text-light); margin-bottom: 15px;">Performance Exemplar</p>
-            <div class="badge-lendaria">🏆 LÍDER INTERNO</div>
+            <div class="badge-lendaria" style="margin-top:10px;">${badge}</div>
           </div>`;
-      });
-
-      // Corretor do Mês
-      db.collection('usuarios').where('liderCorretor','==',true).limit(1).onSnapshot(snap => {
-        const wrap = document.getElementById('lider-corretor-card-wrap');
-        if (snap.empty) { 
-          wrap.innerHTML = '<div class="glass" style="padding: 20px; text-align: center; color: var(--text-light);"><p class="section-title">🌟 Corretor do Mês</p><p style="font-size:12px;">Aguardando definição...</p></div>'; 
-          return; 
-        }
-        const u = snap.docs[0].data();
-        wrap.innerHTML = `
-          <div class="glass lider-destaque" style="padding: 25px; text-align: center;">
-            <p class="section-title">🌟 Corretor do Mês</p>
-            ${renderAvatar(u, 'lg')}
-            <h3 style="margin-top: 15px; font-size: 18px; font-weight: 900;">${u.nome}</h3>
-            <p style="font-size: 12px; color: var(--text-light); margin-bottom: 15px;">Recordista de Vendas</p>
-            <div class="badge-lendaria">🚀 LÍDER CORRETOR</div>
-          </div>`;
-      });
+        });
+      };
+      loadLider('liderInterno', '⭐ Funcionário do Mês', 'lider-interno-card-wrap', '🏆 LÍDER INTERNO');
+      loadLider('liderCorretor', '🌟 Corretor do Mês', 'lider-corretor-card-wrap', '🚀 LÍDER CORRETOR');
     }
 
     function loadStats() {
       db.collection('usuarios').where('aprovado','==',true).onSnapshot(snap => {
         document.getElementById('stat-total').textContent = snap.size;
-        let online = 0;
-        snap.forEach(d => { if(d.data().status === 'online') online++; });
+        let online = 0; snap.forEach(d => { if(d.data().status === 'online') online++; });
         document.getElementById('stat-online').textContent = online;
       });
     }
 
     function loadFeedPreview() {
       db.collection('posts').orderBy('criadoEm', 'desc').limit(3).onSnapshot(snap => {
-        const el = document.getElementById('feed-preview');
-        el.innerHTML = '';
-        if(snap.empty) el.innerHTML = '<p style="font-size:12px; color:var(--text-light);">Nenhuma postagem recente.</p>';
+        const el = document.getElementById('feed-preview'); el.innerHTML = '';
         snap.forEach(doc => {
           const p = doc.data();
-          el.innerHTML += `
-            <div class="glass-sm" style="padding: 10px; font-size: 12px;">
-              <strong>${p.autorNome || 'Usuário'}</strong>: 
-              ${p.texto.substring(0, 50)}${p.texto.length > 50 ? '...' : ''}
-            </div>`;
+          el.innerHTML += `<div class="glass-sm" style="padding: 10px; font-size: 12px;"><strong>${p.autorNome || 'Usuário'}</strong>: ${p.texto.substring(0, 40)}...</div>`;
         });
       });
     }
