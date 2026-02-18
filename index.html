@@ -3,49 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FRUTIGER AERO LÍDER</title>
+<title>Frutiger Aero Hub</title>
 <link rel="stylesheet" href="style.css">
-
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<div id="app-content">
-    <header class="glass-header">
-        <div class="logo">FRUTIGER AERO LÍDER</div>
-        <span class="subtitle">Hub Social da Corretora</span>
-    </header>
+<header class="topbar glass">
+    <div class="welcome">
+        <span id="welcome-text">Bem vindo</span>
+        <small id="date-text"></small>
+    </div>
+    <div class="profile-btn">👤</div>
+</header>
 
-    <main class="hub-layout">
-        <section id="tool-menu" class="tools-sidebar glass">
-            <h3>Ferramentas</h3>
-            <div class="icon-grid">
-                <div class="tool-item">📂 Cadastro</div>
-                <div class="tool-item">📊 Relatórios</div>
-                <div class="tool-item">📋 Cotação</div>
-                <div class="tool-item">⚙️ Painel</div>
-            </div>
-        </section>
+<main class="container">
+    <section class="app-grid glass">
+        <div class="app">📂<span>Cadastro</span></div>
+        <div class="app">📊<span>Relatórios</span></div>
+        <div class="app">📋<span>Cotação</span></div>
+        <div class="app">💬<span>Mensagens</span></div>
+        <div class="app">📈<span>Metas</span></div>
+        <div class="app">🧾<span>Financeiro</span></div>
+        <div class="app">📣<span>Avisos</span></div>
+        <div class="app">⚙️<span>Painel</span></div>
+    </section>
 
-        <section class="rankings-container">
-            <div class="rank-box glass">
-                <h2>🏆 Equipe Interna</h2>
-                <div id="rank-internos" class="rank-list"></div>
-            </div>
-            <div class="rank-box glass">
-                <h2>🚀 Corretores Autônomos</h2>
-                <div id="rank-autonomos" class="rank-list"></div>
-            </div>
-        </section>
-    </main>
-</div>
+    <section class="ranking-area">
+        <div class="rank glass">
+            <h3>Funcionários</h3>
+            <div id="rank-internos"></div>
+        </div>
+        <div class="rank glass">
+            <h3>Corretores</h3>
+            <div id="rank-autonomos"></div>
+        </div>
+    </section>
+</main>
 
 <script src="database.js"></script>
 <script src="hub.js"></script>
 <script>
-window.onload = carregarRanking;
+const d = new Date();
+const dias=["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+const meses=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+document.getElementById('date-text').innerText=`Hoje é ${d.getDate()} ${dias[d.getDay()]}, ${meses[d.getMonth()]}`;
+carregarRanking();
 </script>
-
 </body>
 </html>
