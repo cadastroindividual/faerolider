@@ -1,26 +1,19 @@
-function carregarRanking() {
-    const rankInternos = document.getElementById('rank-internos');
-    const rankAutonomos = document.getElementById('rank-autonomos');
+function carregarRanking(){
+const internos=document.getElementById('rank-internos');
+const autonomos=document.getElementById('rank-autonomos');
 
-    db.collection("usuarios").orderBy("xp", "desc").onSnapshot((snapshot) => {
-        rankInternos.innerHTML = "";
-        rankAutonomos.innerHTML = "";
+if(!internos)return;
 
-        snapshot.forEach((doc) => {
-            const user = doc.data();
-            const card = document.createElement('div');
-            card.className = `user-card ${user.isLiderDoMes ? 'lider-destaque' : ''}`;
+db.collection("usuarios").orderBy("xp","desc").onSnapshot(snap=>{
+internos.innerHTML="";
+autonomos.innerHTML="";
 
-            card.innerHTML = `
-                <div>
-                    <strong>${user.nome}</strong>
-                    <div class="status">${user.humor || '😎 Disponível'}</div>
-                </div>
-                <div class="xp">${user.xp} XP</div>
-            `;
-
-            if(user.tipo === 'interno') rankInternos.appendChild(card);
-            else rankAutonomos.appendChild(card);
-        });
-    });
+snap.forEach(doc=>{
+const u=doc.data();
+const div=document.createElement('div');
+div.className=`user-card ${u.isLiderDoMes?'lider-destaque':''}`;
+div.innerHTML=`<span>${u.nome}</span><b>${u.xp} XP</b>`;
+(u.tipo==='interno'?internos:autonomos).appendChild(div);
+});
+});
 }
