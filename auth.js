@@ -1,42 +1,93 @@
-// auth.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { 
-  getAuth, 
-  onAuthStateChanged, 
-  signOut 
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { 
-  getFirestore 
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { auth, db } from "./firebase-config.js";
 
-// 🔥 SUA CONFIG
-const firebaseConfig = {
-  apiKey: "AIzaSyDJT35OkIJE7nvdndaBcUzuPYIf3S0SbNo",
-  authDomain: "frutigeraero-lider.firebaseapp.com",
-  projectId: "frutigeraero-lider",
-  storageBucket: "frutigeraero-lider.firebasestorage.app",
-  messagingSenderId: "948910846797",
-  appId: "1:948910846797:web:87c04ffad0cec300dcbd04",
-  measurementId: "G-999WRRZKF0"
-};
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-const app = initializeApp(firebaseConfig);
+import {
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+document.addEventListener("DOMContentLoaded", () => {
 
-// 🔒 Proteção automática de rota
-export function requireAuth() {
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.href = "/faerolider/login.html";
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const tipoUsuario = document.getElementById("tipoUsuario");
+
+  async function verificarSeExisteMaster() {
+    const q = query(collection(db, "usuarios"), where("role", "==", "MASTER"));
+    const snapshot = await getDocs(q);
+    return !snapshot.empty;
+  }
+
+  document.getElementById("btnRegister").addEventListener("click", async () => {
+    try {
+
+      const email = emailInput.value;
+      const senha = passwordInput.value;
+      const tipo = tipoUsuario.value;
+
+      if (!email || !senha) {
+        alert("Preencha todos os campos.");
+        return;
+      }
+
+      const masterExiste = await verificarSeExisteMaster();
+
+      const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+      const user = userCredential.user;
+
+      let roleFinal = "USER";
+      let tipoFinal = tipo;
+
+      if (!masterExiste) {
+        roleFinal = "MASTER";
+        tipoFinal = "MASTER";
+        alert("Primeiro usuário criado como MASTER.");
+      } else {
+        if (!tipo) {
+          alert("Selecione o tipo de usuário.");
+          return;
+        }
+      }
+
+      await setDoc(doc(db, "usuarios", user.uid), {
+        email: user.email,
+        role: roleFinal,
+        tipo: tipoFinal,
+        aprovado: true,
+        createdAt: new Date()
+      });
+
+      alert("Conta criada com sucesso!");
+
+    } catch (error) {
+      alert(error.message);
+      console.error(error);
     }
   });
-}
 
-// 🔓 Logout global
-export function logout() {
-  signOut(auth).then(() => {
-    window.location.href = "/faerolider/login.html";
+  document.getElementById("btnLogin").addEventListener("click", async () => {
+    try {
+
+      await signInWithEmailAndPassword(
+        auth,
+        emailInput.value,
+        passwordInput.value
+      );
+
+      window.location.href = "index.html";
+
+    } catch (error) {
+      alert(error.message);
+      console.error(error);
+    }
   });
-}
+
+});
