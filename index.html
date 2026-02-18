@@ -77,6 +77,12 @@
     @media(max-width:1100px){.hub-layout{grid-template-columns:1fr;}}
   </style>
 </head>
+
+  <script type="module">
+import { requireAuth } from "./auth.js";
+requireAuth();
+</script>
+
 <body>
   <div class="bg-sky"></div>
   <div class="aurora aurora-1"></div><div class="aurora aurora-2"></div><div class="aurora aurora-3"></div>
