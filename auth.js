@@ -1,82 +1,42 @@
-// ============================================
-// FRUTIGER AERO LÍDER — Auth & UI
-// ============================================
+// auth.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { 
+  getFirestore 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let currentUser = null;
-let currentUserData = null;
+// 🔥 SUA CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyDJT35OkIJE7nvdndaBcUzuPYIf3S0SbNo",
+  authDomain: "frutigeraero-lider.firebaseapp.com",
+  projectId: "frutigeraero-lider",
+  storageBucket: "frutigeraero-lider.firebasestorage.app",
+  messagingSenderId: "948910846797",
+  appId: "1:948910846797:web:87c04ffad0cec300dcbd04",
+  measurementId: "G-999WRRZKF0"
+};
 
-// ── Login ─────────────────────────────
-async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass  = document.getElementById('login-pass').value;
-  const errEl = document.getElementById('auth-error');
-  errEl.textContent = '';
+const app = initializeApp(firebaseConfig);
 
-  if (!email || !pass) {
-    errEl.textContent = 'Preencha e-mail e senha.';
-    return;
-  }
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
-  try {
-    const cred = await auth.signInWithEmailAndPassword(email, pass);
-    const doc  = await db.collection('usuarios').doc(cred.user.uid).get();
-
-    if (!doc.exists || !doc.data().aprovado) {
-      await auth.signOut();
-      errEl.textContent = '⏳ Conta aguardando aprovação.';
-      return;
+// 🔒 Proteção automática de rota
+export function requireAuth() {
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "/faerolider/login.html";
     }
-
-    window.location.href = 'index.html';
-  } catch (e) {
-    errEl.textContent =
-      e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found'
-        ? 'E-mail ou senha incorretos.'
-        : e.message;
-  }
+  });
 }
 
-// ── Cadastro ──────────────────────────
-async function doSignup() {
-  const nome  = document.getElementById('signup-nome').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
-  const pass  = document.getElementById('signup-pass').value;
-  const tipo  = document.getElementById('signup-tipo').value;
-  const errEl = document.getElementById('auth-error');
-  errEl.textContent = '';
-
-  if (!nome || !email || !pass || !tipo) {
-    errEl.textContent = 'Preencha todos os campos.';
-    return;
-  }
-
-  if (pass.length < 6) {
-    errEl.textContent = 'Senha mínima de 6 caracteres.';
-    return;
-  }
-
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-
-    await db.collection('usuarios').doc(cred.user.uid).set({
-      nome,
-      email,
-      tipo,
-      role: 'user',
-      aprovado: false,
-      xp: 0,
-      nivel: 1,
-      status: 'offline',
-      criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    await auth.signOut();
-    document.getElementById('pending-notice')?.classList.remove('hidden');
-
-  } catch (e) {
-    errEl.textContent =
-      e.code === 'auth/email-already-in-use'
-        ? 'Este e-mail já está cadastrado.'
-        : e.message;
-  }
+// 🔓 Logout global
+export function logout() {
+  signOut(auth).then(() => {
+    window.location.href = "/faerolider/login.html";
+  });
 }
