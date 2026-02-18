@@ -3,21 +3,18 @@
 // ============================================
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDVAf8N6g6zD8VR_TPzQKMsA-eIGQuT0AQ",
-  authDomain: "frutiger-aero-lider.firebaseapp.com",
-  databaseURL: "https://frutiger-aero-lider-default-rtdb.firebaseio.com",
-  projectId: "frutiger-aero-lider",
-  storageBucket: "frutiger-aero-lider.firebasestorage.app",
-  messagingSenderId: "1060513298637",
-  appId: "1:1060513298637:web:6e64a5c736b251605c9184",
-  measurementId: "G-G6XZTKFXM8"
+  apiKey: "AIzaSyDJT35OkIJE7nvdndaBcUzuPYIf3S0SbNo",
+  authDomain: "frutigeraero-lider.firebaseapp.com",
+  projectId: "frutigeraero-lider",
+  storageBucket: "frutigeraero-lider.firebasestorage.app",
+  messagingSenderId: "948910846797",
+  appId: "1:948910846797:web:87c04ffad0cec300dcbd04",
+  measurementId: "G-999WRRZKF0"
 };
 
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db   = firebase.firestore();
-
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 // ── Presença em tempo real ──────────────────
 auth.onAuthStateChanged(user => {
   if (!user) return;
