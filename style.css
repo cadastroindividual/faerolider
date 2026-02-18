@@ -26,15 +26,7 @@
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-
-body{
-  font-family:var(--font);
-  color:var(--text);
-  min-height:100vh;
-  overflow-x:hidden;
-  position:relative;
-}
+html, body { width: 100%; height: 100%; overflow-x: hidden; font-family: var(--font); color: var(--text); }
 
 /* ── BACKGROUND ───────────────────────────── */
 .bg-sky{
@@ -45,10 +37,33 @@ body{
     #e8f8ee 75%,#c8f0a0 88%,#8ee040 100%);
 }
 .aurora{position:fixed;z-index:1;border-radius:50%;filter:blur(80px);opacity:.32;animation:aurora-drift 14s ease-in-out infinite alternate;}
-.aurora-1{width:700px;height:500px;top:-120px;left:-180px;background:radial-gradient(ellipse,#00d4ff 0%,#0066ff 50%,transparent 80%);animation-duration:14s;}
-.aurora-2{width:600px;height:400px;top:20%;right:-120px;background:radial-gradient(ellipse,#00ffcc 0%,#00aaff 50%,transparent 80%);animation-duration:20s;animation-delay:-7s;}
-.aurora-3{width:500px;height:350px;bottom:8%;left:28%;background:radial-gradient(ellipse,#aaffee 0%,#00ddbb 50%,transparent 80%);animation-duration:24s;animation-delay:-12s;}
+.aurora-1{width:700px;height:500px;top:-120px;left:-180px;background:radial-gradient(ellipse,#00d4ff 0%,#0066ff 50%,transparent 80%);}
+.aurora-2{width:600px;height:400px;top:20%;right:-120px;background:radial-gradient(ellipse,#00ffcc 0%,#00aaff 50%,transparent 80%);}
 @keyframes aurora-drift{0%{transform:translate(0,0) scale(1);}100%{transform:translate(40px,30px) scale(1.15);}}
+
+/* ── LAYOUT FULL WIDTH ─────────────────────── */
+header#global-header {
+  margin: 15px 20px !important;
+  width: calc(100% - 40px);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 100;
+}
+
+.hub-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 300px;
+  gap: 20px;
+  padding: 0 20px 100px;
+  width: 100%;
+  max-width: 100% !important;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
 
 /* ── GLASS ─────────────────────────────────── */
 .glass{
@@ -56,8 +71,6 @@ body{
   backdrop-filter:blur(16px) saturate(180%);
   -webkit-backdrop-filter:blur(16px) saturate(180%);
   border:1.5px solid var(--glass-border);
-  border-bottom-color:rgba(255,255,255,.4);
-  border-right-color:rgba(255,255,255,.4);
   box-shadow:0 8px 32px var(--glass-shadow),0 2px 8px rgba(255,255,255,.55) inset;
   border-radius:var(--radius);
   position:relative;overflow:hidden;
@@ -65,7 +78,7 @@ body{
 .glass::before{
   content:'';position:absolute;top:0;left:0;right:0;height:48%;
   background:linear-gradient(180deg,rgba(255,255,255,.5) 0%,transparent 100%);
-  border-radius:var(--radius) var(--radius) 0 0;pointer-events:none;z-index:0;
+  pointer-events:none;z-index:0;
 }
 .glass>*{position:relative;z-index:1;}
 
@@ -74,167 +87,63 @@ body{
   backdrop-filter:blur(10px);
   border:1px solid rgba(255,255,255,.8);
   border-radius:var(--radius-sm);
-  box-shadow:0 4px 14px rgba(0,60,180,.09),0 1px 3px rgba(255,255,255,.6) inset;
-  position:relative;overflow:hidden;
+  box-shadow:0 4px 14px rgba(0,60,180,.09);
 }
 
-/* ── BUTTONS FRUTIGER AERO (GEL/GLASS) ─────── */
+/* ── BUTTONS ───────────────────────────────── */
 .btn{
   position:relative;overflow:hidden;
   border:none;cursor:pointer;
   font-family:var(--font);font-weight:700;
   border-radius:50px;transition:var(--trans);
-  letter-spacing:.5px;display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  padding:10px 22px;
-  color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 22px; color:#fff;
   text-shadow:0 1px 2px rgba(0,0,0,0.2);
   box-shadow:0 4px 15px rgba(0,0,0,0.1), 0 2px 4px rgba(255,255,255,0.4) inset;
 }
-.btn::after{
-  content:'';position:absolute;top:2px;left:15%;right:15%;height:40%;
-  background:linear-gradient(180deg,rgba(255,255,255,0.5) 0%,transparent 100%);
-  border-radius:50px;
-}
-.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.15);}
-.btn:active{transform:translateY(0);filter:brightness(0.9);}
-
 .btn-blue{background:linear-gradient(180deg,#55b8ff,#0088ee);}
 .btn-green{background:linear-gradient(180deg,#aaff66,#44cc22);}
 .btn-gold{background:linear-gradient(180deg,#ffdd44,#ff9900);}
 .btn-pink{background:linear-gradient(180deg,#ffb0e0,#ff44aa);}
 .btn-red{background:linear-gradient(180deg,#ff9080,#ff3300);}
 
-/* ── TOOL BUTTONS (SIDEBAR) ────────────────── */
 .tool-btn{
   display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;
   background:rgba(255,255,255,.4);border:1.5px solid rgba(255,255,255,.75);
   cursor:pointer;font-family:var(--font);font-size:14px;font-weight:800;color:var(--text);
   transition:var(--trans);text-align:left;width:100%;margin-bottom:8px;
-  box-shadow:0 2px 8px rgba(0,80,200,.05);
 }
-.tool-btn:hover{background:rgba(255,255,255,.65);transform:translateX(4px);box-shadow:0 4px 14px rgba(0,100,255,.12);}
+.tool-btn:hover{background:rgba(255,255,255,.65);transform:translateX(4px);}
 
-/* ── NOVOS ESTILOS GAMIFICAÇÃO ──────────────── */
-
-/* Brilho Dourado Animado para Líderes */
+/* ── GAMIFICAÇÃO ───────────────────────────── */
 .lider-destaque {
   position: relative;
   border: 2.5px solid rgba(255, 215, 0, 0.85) !important;
-  box-shadow: 0 0 25px rgba(255, 215, 0, 0.5), inset 0 0 12px rgba(255, 215, 0, 0.2) !important;
   animation: gold-glow 3s infinite ease-in-out;
 }
-
 @keyframes gold-glow {
-  0%, 100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); border-color: rgba(255, 215, 0, 0.6); }
-  50% { box-shadow: 0 0 35px rgba(255, 215, 0, 0.8); border-color: rgba(255, 255, 255, 1); transform: scale(1.02); }
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+  50% { box-shadow: 0 0 35px rgba(255, 215, 0, 0.8); transform: scale(1.02); }
 }
 
-/* Categorias de Conquistas (Badges) */
 .badge-lendaria {
   background: linear-gradient(135deg, #fff7ad 0%, #ffa900 50%, #ff7b00 100%);
   border: 2px solid #fff;
-  box-shadow: 0 0 15px rgba(255, 165, 0, 0.6), 0 2px 4px rgba(0,0,0,0.2);
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  position: relative; overflow: hidden;
-  padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 12px;
-}
-.badge-lendaria::after {
-  content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent);
-  transform: rotate(45deg); animation: shine-sweep 3s infinite;
-}
-
-@keyframes shine-sweep {
-  0% { transform: translateX(-100%) rotate(45deg); }
-  20%, 100% { transform: translateX(200%) rotate(45deg); }
-}
-
-/* Brilho dourado pulsante para badges lendárias */
-.badge-lendaria {
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.6);
+  color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 11px;
   animation: gold-pulse 2s infinite ease-in-out;
 }
-
-@keyframes gold-pulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.6); }
-  50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.9); }
-}
-
-.badge-rara {
-  background: linear-gradient(135deg, #e0c3fc 0%, #8e2de2 50%, #4a00e0 100%);
-  border: 2px solid rgba(255,255,255,0.8);
-  box-shadow: 0 0 12px rgba(138, 43, 226, 0.5);
-  color: #fff;
-  padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 12px;
-}
+@keyframes gold-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
 
 .badge-comum {
   background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(8px);
   border: 1.5px solid var(--glass-border);
-  color: var(--text);
-  padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  color: var(--text); padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 10px;
 }
 
-/* ── INPUTS ────────────────────────────────── */
-.aero-input, .aero-select, .aero-textarea {
-  width: 100%; padding: 12px 16px; border-radius: 14px;
-  background: rgba(255,255,255,0.7); border: 1.5px solid rgba(255,255,255,0.9);
-  font-family: var(--font); color: var(--text); outline: none;
-  transition: var(--trans); box-shadow: 0 2px 8px rgba(0,80,200,0.08);
-}
-.aero-input:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(0,136,255,0.15); }
-
-.section-title { font-size: 13px; font-weight: 900; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.section-title { font-size: 12px; font-weight: 900; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
 .hidden { display: none !important; }
 
-/* ── AJUSTES DE LAYOUT FULL-WIDTH ──────────── */
-.hub-layout {
-  display: grid;
-  grid-template-columns: 280px 1fr 320px;
-  gap: 20px;
-  padding: 0 20px 100px;
-  max-width: 100% !important; /* Forçar largura total */
-  width: 100%;
-  margin: 0 auto;
-}
-
-header#global-header {
-  margin: 15px 20px !important;
-  width: calc(100% - 40px);
-}
-
-#user-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-left: auto; /* Empurrar para a direita */
-}
-
-/* Garantir que os cards de líder tenham altura mínima */
-#lider-interno-card-wrap, #lider-corretor-card-wrap {
-  min-height: 200px;
-  margin-bottom: 20px;
-}
-
-/* Responsividade básica */
-@media (max-width: 1100px) {
-  .hub-layout {
-    grid-template-columns: 240px 1fr;
-  }
-  aside:last-child {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .hub-layout {
-    grid-template-columns: 1fr;
-  }
-  aside:last-child {
-    grid-template-columns: 1fr;
-  }
-}
+/* ── ORB AVATARS ───────────────────────────── */
+.orb { border-radius: 50%; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
