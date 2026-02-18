@@ -19,6 +19,15 @@
   <button id="btnRegister" class="btn btn-green" style="width:100%;">Criar Conta</button>
 </div>
 
-<script type="module" src="auth.js"></script>
+<script type="module">
+import { auth } from "./auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window.location.href = "index.html";
+  }
+});
+</script>
 </body>
 </html>
